@@ -1,0 +1,41 @@
+body {
+    display: flex;
+    flex-direction: row;
+    background-color: black;
+    color: white;
+    width: 100vw;
+    height: 100dvh;
+    margin: 0;
+    font-family: sans-serif;
+}
+#left, #right {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+#preview {
+    flex-grow: 1;
+}
+#editor-canvas {
+    width: 100%;
+    flex-grow: 1;
+}
+
+.multioption {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.multioption p {
+    margin: 0;
+    padding: 0;
+}
+.multioption-pill {
+    padding: 5px;
+}
+.multioption-pill input {
+    display: none;
+}
+.multioption-pill:has(input:checked) {
+    background-color: pink;
+}

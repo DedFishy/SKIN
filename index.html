@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SKIN</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div id="left">
+            <div id="canvas-options">
+                <form class="multioption">
+                    <p>Side:</p>
+                    <div class="multioption-pill">
+                        <input type="radio" name="side" id="side-front" value="Front">
+                        <label for="side-front">Front</label>
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="side" id="side-back" value="Back">
+                        <label for="side-back">Back</label>
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="side" id="side-left" value="Left">
+                        <label for="side-left">Left</label>
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="side" id="side-right" value="Right">
+                        <label for="side-right">Right</label>
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="side" id="side-top" value="Top">
+                        <label for="side-top">Top</label>
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="side" id="side-bottom" value="Bottom">
+                        <label for="side-bottom">Bottom</label>
+                    </div>
+                </form>
+            </div>
+            <canvas id="editor-canvas">This editor requires the canvas element.</canvas>
+        </div>
+        <div id="right">
+            <div id="options-menu">
+                <button>Open</button>
+                <button>Save</button>
+                <input type="text" placeholder="Name">
+                <button>Load From Account</button>
+            </div>
+            <div id="preview">
+
+            </div>
+
+            <script type="text/javascript" src="skineditor.js"></script>
+        </div>
+    </body>
+</html>
