@@ -3,11 +3,22 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>SKIN</title>
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="/style.css">
     </head>
     <body>
         <div id="left">
             <div id="canvas-options">
+                <form class="multioption">
+                    <p>Layer:</p>
+                    <div class="multioption-pill">
+                        <input type="radio" name="layer" id="layer-base" value="Base">
+                        <label for="layer-base">Base</label>
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="layer" id="layer-outer" value="Outer">
+                        <label for="layer-outer">Outer</label>
+                    </div>
+                </form>
                 <form class="multioption">
                     <p>Side:</p>
                     <div class="multioption-pill">
@@ -35,6 +46,33 @@
                         <label for="side-bottom">Bottom</label>
                     </div>
                 </form>
+                <form class="multioption">
+                    <p>Part:</p>
+                    <div class="multioption-pill">
+                        <input type="radio" name="part" id="part-head" value="Head">
+                        <label for="part-head">Head</label>
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="part" id="part-body" value="Body">
+                        <label for="part-body">Body</label>
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="part" id="part-left-arm" value="Left Arm">
+                        <label for="part-left-arm">Left Arm</label>
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="part" id="part-right-arm" value="Right Arm">
+                        <label for="part-right-arm">Right Arm</label>
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="part" id="part-left-leg" value="Left Leg">
+                        <label for="part-left-leg">Left Leg</label>
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="part" id="part-right-leg" value="Right Leg">
+                        <label for="part-right-leg">Right Leg</label>
+                    </div>
+                </form>
             </div>
             <canvas id="editor-canvas">This editor requires the canvas element.</canvas>
         </div>
@@ -49,7 +87,7 @@
 
             </div>
 
-            <script type="text/javascript" src="skineditor.js"></script>
+            <script type="text/javascript" src="/skineditor.js"></script>
         </div>
     </body>
 </html>

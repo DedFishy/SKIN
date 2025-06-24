@@ -1,7 +1,12 @@
+:root {
+    --background-color: black;
+    --accent-color: yellow;
+}
+
 body {
     display: flex;
     flex-direction: row;
-    background-color: black;
+    background-color: var(--background-color);
     color: white;
     width: 100vw;
     height: 100dvh;
@@ -12,6 +17,7 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 #preview {
     flex-grow: 1;
@@ -19,23 +25,29 @@ body {
 #editor-canvas {
     width: 100%;
     flex-grow: 1;
+    height: inherit;
 }
 
 .multioption {
     display: flex;
     flex-direction: row;
     align-items: center;
+    margin: 5px;
+    user-select: none;
 }
 .multioption p {
     margin: 0;
     padding: 0;
+    font-weight: bold;
 }
 .multioption-pill {
     padding: 5px;
+    border-radius: 10px;
 }
 .multioption-pill input {
     display: none;
 }
 .multioption-pill:has(input:checked) {
-    background-color: pink;
+    background-color: var(--accent-color);
+    color: black;
 }
