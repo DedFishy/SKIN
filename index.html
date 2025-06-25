@@ -85,8 +85,20 @@
                     <div class="multioption-pill">
                         <input type="radio" name="brush" id="brush-draw" value="Draw">
                         <label for="brush-draw">Draw</label>
+                        
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="brush" id="brush-bucket" value="Bucket">
+                        <label for="brush-bucket">Bucket</label>
                     </div>
                 </form>
+
+                <div class="multioption-hidden brush-option">
+                    <label for="brush-draw-size">Size:</label>
+                    <input type="range" min="1" max="12" name="brush" id="brush-draw-size" value="1" autocomplete="off" onchange="updateBrushDrawSize()">
+                </div>
+                
+
                 
                 
             </div>

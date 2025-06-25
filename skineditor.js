@@ -1,7 +1,7 @@
 const editorCanvas = document.getElementById("editor-canvas");
 const context = editorCanvas.getContext("2d");
 
-
+const brushDrawSizeSlider = document.getElementById("brush-draw-size")
 
 let startX = 0
 let startY = 0
@@ -13,6 +13,8 @@ let height = 0;
 var fullSkinCanvas;
 var fullSkinContext;
 var loadedSkin;
+
+var brushSize = 1;
 
 loadURLAsCanvas("/default_skin.png");
 
@@ -178,15 +180,20 @@ skinDimensions = {
 function loadURLAsCanvas(url) {
     loadedSkin = new Image();
     loadedSkin.onload = () => {
+        fullSkinCanvas.width = loadedSkin.width;
+        fullSkinCanvas.height = loadedSkin.height;
         fullSkinContext.drawImage(loadedSkin, 0, 0);
         loadSectionToCanvas();
     }
     loadedSkin.src = url;
     fullSkinCanvas = document.createElement("canvas");
-    fullSkinCanvas.width = loadedSkin.width;
-    fullSkinCanvas.height = loadedSkin.height;
+    
     fullSkinContext = fullSkinCanvas.getContext("2d");
     
+}
+
+function updateBrushDrawSize() {
+    brushSize = Number(brushDrawSizeSlider.value);
 }
 
 function loadSectionToCanvas() {
@@ -234,13 +241,13 @@ function applyBrushAt(x, y) {
 
     // Do for current view context
     context.fillStyle = "rgb(255 0 0)";
-    context.fillRect(x, y, 1, 1);
+    context.fillRect(x, y, brushSize, brushSize);
 
     // Do for full skin
     x += startX;
     y += startY;
     fullSkinContext.fillStyle = "rgb(255 0 0)";
-    fullSkinContext.fillRect(x, y, 1, 1);
+    fullSkinContext.fillRect(x, y, brushSize, brushSize);
 }
 
 editorCanvas.onclick = function(e) {

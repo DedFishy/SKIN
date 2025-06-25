@@ -13,6 +13,11 @@ body {
     margin: 0;
     font-family: sans-serif;
 }
+
+.multioption-hidden {
+    display: none;
+}
+
 #left, #right {
     flex-grow: 1;
     display: flex;
@@ -54,11 +59,22 @@ body {
 .multioption-pill {
     padding: 5px;
     border-radius: 10px;
+    display: flex;
 }
-.multioption-pill input {
+.multioption-pill label {
+    margin-left: 4px;
+    margin-right: 4px;
+}
+.multioption-pill input[type="radio"] {
     display: none;
 }
 .multioption-pill:has(input:checked) {
     background-color: var(--accent-color);
     color: black;
+}
+
+/* ALL of the multiselector appearing options (I see why people like CSS libraries...) */
+.multioption:has(.multioption-pill #brush-draw[type="radio"]:checked) ~ .brush-option {
+    display: flex;
+    flex-direction: row;
 }
