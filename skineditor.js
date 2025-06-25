@@ -329,7 +329,7 @@ function loadSectionToCanvas() {
         context.canvas.height = 1/sectionSizeRatio * maxWidth;
     } else {
         context.canvas.height = maxHeight;
-        context.canvas.height = sectionSizeRatio * maxHeight;
+        context.canvas.width = sectionSizeRatio * maxHeight;
     }
 
     context.imageSmoothingEnabled = false;
@@ -437,6 +437,10 @@ function applyTexArrayToMatArray(texArray, matArray) {
 function updatePreviewTexture() {
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Head"), headMaterials);
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Body"), bodyMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Left Arm"), leftArmMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Right Arm"), rightArmMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Left Leg"), leftLegMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Right Leg"), rightLegMaterials);
 }
 
 function consructPartGeometry(width, height, depth, x, y, z) {
@@ -450,6 +454,9 @@ function consructPartGeometry(width, height, depth, x, y, z) {
         new THREE.MeshBasicMaterial({map: defaultTexture})
     ]
     const mesh = new THREE.Mesh(geometry, materials);
+    mesh.translateX(x);
+    mesh.translateY(y);
+    mesh.translateZ(z);
     preview.add(mesh);
     return [mesh, materials];
 }
@@ -471,11 +478,14 @@ const controls = new OrbitControls(previewCamera, renderer.domElement);
 
 const defaultTexture = new THREE.Texture();
 
-const [headMesh, headMaterials] = consructPartGeometry(8, 8, 8, 0, 0, 0);
+const [headMesh, headMaterials] = consructPartGeometry(8, 8, 8, 0, 10, 0);
 const [bodyMesh, bodyMaterials] = consructPartGeometry(8, 12, 4, 0, 0, 0);
-const [leftArmMesh, leftArmMaterials] = consructPartGeometry()
+const [leftArmMesh, leftArmMaterials] = consructPartGeometry(4,12,4,-6,0,0)
+const [rightArmMesh, rightArmMaterials] = consructPartGeometry(4,12,4,6,0,0)
+const [leftLegMesh, leftLegMaterials] = consructPartGeometry(4,12,4,-2,-12,0)
+const [rightLegMesh, rightLegMaterials] = consructPartGeometry(4,12,4,2,-12,0)
 
-previewCamera.position.z = 15;
+previewCamera.position.z = 30;
 
 controls.update();
 
