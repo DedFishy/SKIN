@@ -16,13 +16,14 @@ document.getElementById("brush-draw-size").onchange = () => {updateBrushDrawSize
 document.getElementById("save-skin").onclick = () => {saveSkin()};
 document.getElementById("load-skin-from-account").onclick = () => {loadURLAsCanvas("https://mineskin.eu/skin/" + skinAccountNameInput.value)};
 
+
 document.body.onload = () => {
     updatePreviewSize();
 }
 
 const multioptions = document.getElementsByClassName("multioption");
 for(let i = 0; i < multioptions.length; i++) {
-    multioptions[i].onclick = () => {loadSectionToCanvas()};
+    multioptions[i].onclick = () => {loadSectionToCanvas(); updatePreviewTexture();};
 }
 
 let startX = 0
@@ -188,11 +189,11 @@ const skinDimensions = {
         },
         "Right": {
             "Classic": {
-                "Base": [28,52,31,63],
+                "Base": [40,52,43,63],
                 "Outer": [60,52,63,63]
             },
             "Slim": {
-                "Base": [28,52,31,63],
+                "Base": [40,52,43,63],
                 "Outer": [60,52,63,63]
             }
         },
@@ -417,7 +418,7 @@ function getPartAsCubeTextureArray(layer, part) {
     const type = getSelectedType();
     const get = (side) => {return getSectionAsURL(layer, side, part, type)};
 
-    return [
+    const textures = [
         loader.load(get("Right")),
         loader.load(get("Left")),
         loader.load(get("Top")),
@@ -425,6 +426,8 @@ function getPartAsCubeTextureArray(layer, part) {
         loader.load(get("Front")),
         loader.load(get("Back")),
     ];
+    textures[3].flipY = false;
+    return textures;
 
 }
 function applyTexArrayToMatArray(texArray, matArray) {
@@ -435,10 +438,25 @@ function applyTexArrayToMatArray(texArray, matArray) {
     });
 }
 function updatePreviewTexture() {
+    const type = getSelectedType();
+    if (type == "Slim") {
+        leftArmMesh.visible = false;
+        rightArmMesh.visible = false;
+        rightArmSlimMesh.visible = true;
+        leftArmSlimMesh.visible = true;
+    } else {
+        leftArmMesh.visible = true;
+        rightArmMesh.visible = true;
+        leftArmSlimMesh.visible = false;
+        rightArmSlimMesh.visible = false;
+    }
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Head"), headMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Outer", "Head"), headOuterMaterials);
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Body"), bodyMaterials);
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Left Arm"), leftArmMaterials);
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Right Arm"), rightArmMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Left Arm"), leftArmSlimMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Right Arm"), rightArmSlimMaterials);
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Left Leg"), leftLegMaterials);
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Right Leg"), rightLegMaterials);
 }
@@ -446,12 +464,12 @@ function updatePreviewTexture() {
 function consructPartGeometry(width, height, depth, x, y, z) {
     const geometry = new THREE.BoxGeometry(width, height, depth);
     const materials = [
-        new THREE.MeshBasicMaterial({map: defaultTexture}),
-        new THREE.MeshBasicMaterial({map: defaultTexture}),
-        new THREE.MeshBasicMaterial({map: defaultTexture}),
-        new THREE.MeshBasicMaterial({map: defaultTexture}),
-        new THREE.MeshBasicMaterial({map: defaultTexture}),
-        new THREE.MeshBasicMaterial({map: defaultTexture})
+        new THREE.MeshBasicMaterial({map: defaultTexture, transparent: true, color: 0xcccccc}),
+        new THREE.MeshBasicMaterial({map: defaultTexture, transparent: true, color: 0xcccccc}),
+        new THREE.MeshBasicMaterial({map: defaultTexture, transparent: true, color: 0xcccccc}),
+        new THREE.MeshBasicMaterial({map: defaultTexture, transparent: true, color: 0xcccccc}),
+        new THREE.MeshBasicMaterial({map: defaultTexture, transparent: true, color: 0xcccccc}),
+        new THREE.MeshBasicMaterial({map: defaultTexture, transparent: true, color: 0xcccccc})
     ]
     const mesh = new THREE.Mesh(geometry, materials);
     mesh.translateX(x);
@@ -464,7 +482,7 @@ function consructPartGeometry(width, height, depth, x, y, z) {
 const loader = new THREE.TextureLoader();
 
 const preview = new THREE.Scene();
-preview.background = new THREE.Color().setHex(0xffffff);
+//preview.background = new THREE.Color().setHex(0xffffff);
 const previewCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 
 const renderer = new THREE.WebGLRenderer();
@@ -479,9 +497,12 @@ const controls = new OrbitControls(previewCamera, renderer.domElement);
 const defaultTexture = new THREE.Texture();
 
 const [headMesh, headMaterials] = consructPartGeometry(8, 8, 8, 0, 10, 0);
+const [headOuterMesh, headOuterMaterials] = consructPartGeometry(8.25, 8.25, 8.25, 0, 10, 0);
 const [bodyMesh, bodyMaterials] = consructPartGeometry(8, 12, 4, 0, 0, 0);
 const [leftArmMesh, leftArmMaterials] = consructPartGeometry(4,12,4,-6,0,0)
 const [rightArmMesh, rightArmMaterials] = consructPartGeometry(4,12,4,6,0,0)
+const [leftArmSlimMesh, leftArmSlimMaterials] = consructPartGeometry(3,12,4,-5.5,0,0)
+const [rightArmSlimMesh, rightArmSlimMaterials] = consructPartGeometry(3,12,4,5.5,0,0)
 const [leftLegMesh, leftLegMaterials] = consructPartGeometry(4,12,4,-2,-12,0)
 const [rightLegMesh, rightLegMaterials] = consructPartGeometry(4,12,4,2,-12,0)
 
