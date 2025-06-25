@@ -1,7 +1,17 @@
+import * as THREE from 'three';
+
 const editorCanvas = document.getElementById("editor-canvas");
 const context = editorCanvas.getContext("2d");
 
 const brushDrawSizeSlider = document.getElementById("brush-draw-size")
+
+// Event Listeners
+document.getElementById("brush-draw-size").onchange = () => {updateBrushDrawSize()};
+
+const multioptions = document.getElementsByClassName("multioption");
+for(let i = 0; i < multioptions.length; i++) {
+    multioptions[i].onclick = () => {loadSectionToCanvas()};
+}
 
 let startX = 0
 let startY = 0
@@ -18,7 +28,7 @@ var brushSize = 1;
 
 loadURLAsCanvas("/default_skin.png");
 
-skinDimensions = {
+const skinDimensions = {
     "Head": {
         "Top": {
             "Base": [8,0,15,7],
@@ -189,8 +199,8 @@ function loadURLAsCanvas(url) {
     fullSkinCanvas = document.createElement("canvas");
     
     fullSkinContext = fullSkinCanvas.getContext("2d");
-    
 }
+
 
 function updateBrushDrawSize() {
     brushSize = Number(brushDrawSizeSlider.value);
@@ -256,3 +266,6 @@ editorCanvas.onclick = function(e) {
     console.log(pixelX, pixelY);
     applyBrushAt(pixelX, pixelY);
 }
+
+const preview = new THREE.Scene();
+const previewCamera = new THREE.PerspectiveCamera()

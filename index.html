@@ -14,7 +14,7 @@
         </div>
         <div id="right">
             <div id="canvas-options">
-                <form class="multioption" onclick="loadSectionToCanvas()">
+                <form class="multioption">
                     <p>Layer:</p>
                     <div class="multioption-pill">
                         <input type="radio" name="layer" id="layer-base" value="Base">
@@ -25,7 +25,7 @@
                         <label for="layer-outer">Outer</label>
                     </div>
                 </form>
-                <form class="multioption" onclick="loadSectionToCanvas()">
+                <form class="multioption">
                     <p>Side:</p>
                     <div class="multioption-pill">
                         <input type="radio" name="side" id="side-front" value="Front">
@@ -52,7 +52,7 @@
                         <label for="side-bottom">Bottom</label>
                     </div>
                 </form>
-                <form class="multioption" onclick="loadSectionToCanvas()">
+                <form class="multioption">
                     <p>Part:</p>
                     <div class="multioption-pill">
                         <input type="radio" name="part" id="part-head" value="Head">
@@ -95,7 +95,7 @@
 
                 <div class="multioption-hidden brush-option">
                     <label for="brush-draw-size">Size:</label>
-                    <input type="range" min="1" max="12" name="brush" id="brush-draw-size" value="1" autocomplete="off" onchange="updateBrushDrawSize()">
+                    <input type="range" min="1" max="12" name="brush" id="brush-draw-size" value="1" autocomplete="off">
                 </div>
                 
 
@@ -112,7 +112,16 @@
 
             </div>
 
-            <script type="text/javascript" src="/skineditor.js"></script>
+            <script type="importmap">
+            {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.177.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/"
+            }
+            }
+            </script>
+            
+            <script type="module" src="/skineditor.js"></script>
         </div>
     </body>
 </html>
