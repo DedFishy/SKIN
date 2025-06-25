@@ -426,7 +426,9 @@ function getPartAsCubeTextureArray(layer, part) {
         loader.load(get("Front")),
         loader.load(get("Back")),
     ];
-    textures[3].flipY = false;
+    if (layer != "Outer") {
+        textures[3].flipY = false;
+    }
     return textures;
 
 }
@@ -442,23 +444,42 @@ function updatePreviewTexture() {
     if (type == "Slim") {
         leftArmMesh.visible = false;
         rightArmMesh.visible = false;
+        leftArmOuterMesh.visible = false;
+        rightArmOuterMesh.visible = false;
         rightArmSlimMesh.visible = true;
         leftArmSlimMesh.visible = true;
+        rightArmOuterSlimMesh.visible = true;
+        leftArmOuterSlimMesh.visible = true;
     } else {
         leftArmMesh.visible = true;
         rightArmMesh.visible = true;
+        leftArmOuterMesh.visible = true;
+        rightArmOuterMesh.visible = true;
         leftArmSlimMesh.visible = false;
         rightArmSlimMesh.visible = false;
+        leftArmOuterSlimMesh.visible = false;
+        rightArmOuterSlimMesh.visible = false;
     }
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Head"), headMaterials);
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Outer", "Head"), headOuterMaterials);
+
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Body"), bodyMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Outer", "Body"), bodyOuterMaterials);
+
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Left Arm"), leftArmMaterials);
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Right Arm"), rightArmMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Outer", "Left Arm"), leftArmOuterMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Outer", "Right Arm"), rightArmOuterMaterials);
+
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Left Arm"), leftArmSlimMaterials);
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Right Arm"), rightArmSlimMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Outer", "Left Arm"), leftArmOuterSlimMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Outer", "Right Arm"), rightArmOuterSlimMaterials);
+
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Left Leg"), leftLegMaterials);
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Right Leg"), rightLegMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Outer", "Left Leg"), leftLegOuterMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Outer", "Right Leg"), rightLegOuterMaterials);
 }
 
 function consructPartGeometry(width, height, depth, x, y, z) {
@@ -478,6 +499,65 @@ function consructPartGeometry(width, height, depth, x, y, z) {
     preview.add(mesh);
     return [mesh, materials];
 }
+const getPlaneTranslation = (index, w, h, d) => {
+    switch (index) {
+        case 0: return [w/2 + outerIncrease,0,0]  // Left  
+        case 1: return [-w/2 - outerIncrease,0,0] // Right  
+        case 2: return [0,h/2 + outerIncrease,0]  // Top   
+        case 3: return [0,-h/2 - outerIncrease,0] // Bottom 
+        case 4: return [0,0,d/2 + outerIncrease]  // Front 
+        case 5: return [0,0,-d/2 - outerIncrease] // Back   
+    }
+    return [w, h, d]
+}
+const getPlaneRotation = (index) => {
+    switch (index) {
+        case 0: return [0, Math.PI/2, 0]  // Left  
+        case 1: return [0, -Math.PI/2, 0] // Right 
+        case 2: return [-Math.PI/2, 0, 0] // Top   
+        case 3: return [Math.PI/2, 0, 0]  // Bottom
+        case 4: return [0, 0, 0]          // Front 
+        case 5: return [0, Math.PI, 0]    // Back  
+    }
+    return [0, 0, 0]
+}
+function consructPartOuterGeometry(width, height, depth, x, y, z) {
+
+    const geometries = [
+        new THREE.PlaneGeometry(depth, height), // Left  
+        new THREE.PlaneGeometry(depth, height), // Right 
+        new THREE.PlaneGeometry(width, depth),  // Top   
+        new THREE.PlaneGeometry(width, depth),  // Bottom
+        new THREE.PlaneGeometry(width, height), // Front 
+        new THREE.PlaneGeometry(width, height), // Back  
+    ];
+    const materials = [
+        new THREE.MeshBasicMaterial({map: defaultTexture, transparent: true, color: 0xcccccc}), // Left  
+        new THREE.MeshBasicMaterial({map: defaultTexture, transparent: true, color: 0xcccccc}), // Right 
+        new THREE.MeshBasicMaterial({map: defaultTexture, transparent: true, color: 0xcccccc}), // Top   
+        new THREE.MeshBasicMaterial({map: defaultTexture, transparent: true, color: 0xcccccc}), // Bottom
+        new THREE.MeshBasicMaterial({map: defaultTexture, transparent: true, color: 0xcccccc}), // Front 
+        new THREE.MeshBasicMaterial({map: defaultTexture, transparent: true, color: 0xcccccc})  // Back  
+    ]
+    
+    const meshes = [];
+    for (let i = 0; i < geometries.length; i++) {
+        meshes.push(new THREE.Mesh(geometries[i], materials[i]))
+        const translation = getPlaneTranslation(i, width, height, depth);
+        const rotation = getPlaneRotation(i);
+        meshes[i].translateX(x + translation[0]);
+        meshes[i].translateY(y + translation[1]);
+        meshes[i].translateZ(z + translation[2]);
+        meshes[i].rotateX(rotation[0]);
+        meshes[i].rotateY(rotation[1]);
+        meshes[i].rotateZ(rotation[2]);
+    }
+    
+    meshes.forEach((value, index, array) => {
+        preview.add(value);
+    });
+    return [meshes, materials];
+}
 
 const loader = new THREE.TextureLoader();
 
@@ -494,17 +574,31 @@ const controls = new OrbitControls(previewCamera, renderer.domElement);
 //const light = new THREE.AmbientLight( 0xffffff ); // soft white light
 //preview.add( light );
 
-const defaultTexture = new THREE.Texture();
+const outerIncrease = 0.25;
 
-const [headMesh, headMaterials] = consructPartGeometry(8, 8, 8, 0, 10, 0);
-const [headOuterMesh, headOuterMaterials] = consructPartGeometry(8.25, 8.25, 8.25, 0, 10, 0);
-const [bodyMesh, bodyMaterials] = consructPartGeometry(8, 12, 4, 0, 0, 0);
-const [leftArmMesh, leftArmMaterials] = consructPartGeometry(4,12,4,-6,0,0)
-const [rightArmMesh, rightArmMaterials] = consructPartGeometry(4,12,4,6,0,0)
-const [leftArmSlimMesh, leftArmSlimMaterials] = consructPartGeometry(3,12,4,-5.5,0,0)
-const [rightArmSlimMesh, rightArmSlimMaterials] = consructPartGeometry(3,12,4,5.5,0,0)
-const [leftLegMesh, leftLegMaterials] = consructPartGeometry(4,12,4,-2,-12,0)
-const [rightLegMesh, rightLegMaterials] = consructPartGeometry(4,12,4,2,-12,0)
+const defaultTexture = new THREE.Texture();
+//     Mesh Name              Material Name                                 Width Height Length X     Y    Z
+const [headMesh,              headMaterials] =              consructPartGeometry(8,    8,     8,     0,    10,  0);
+const [headOuterMesh,         headOuterMaterials] =         consructPartOuterGeometry(8, 8,  8,  0,    10,  0);
+
+const [bodyMesh,              bodyMaterials] =              consructPartGeometry(8,    12,    4,     0,    0,   0);
+const [bodyOuterMesh,         bodyOuterMaterials] =         consructPartOuterGeometry(8, 12, 4,  0,    0,   0);
+
+const [leftArmMesh,           leftArmMaterials] =           consructPartGeometry(4,    12,    4,     -6,   0,   0);
+const [leftArmOuterMesh,      leftArmOuterMaterials] =      consructPartOuterGeometry(4, 12, 4, -6, 0, 0);
+
+const [rightArmMesh,          rightArmMaterials] =          consructPartGeometry(4,    12,    4,     6,    0,   0);
+const [rightArmOuterMesh,     rightArmOuterMaterials] =     consructPartOuterGeometry(4, 12, 4, 6, 0, 0);
+
+const [leftArmSlimMesh,       leftArmSlimMaterials] =       consructPartGeometry(3,    12,    4,     -5, 0,   0);
+const [leftArmOuterSlimMesh,  leftArmOuterSlimMaterials] =  consructPartOuterGeometry(3,    12,    4,     -5, 0,   0);
+const [rightArmSlimMesh,      rightArmSlimMaterials] =      consructPartGeometry(3,    12,    4,     5,  0,   0);
+const [rightArmOuterSlimMesh, rightArmOuterSlimMaterials] = consructPartOuterGeometry(3,    12,    4,     5,  0,   0);
+
+const [leftLegMesh,           leftLegMaterials] =           consructPartGeometry(4,    12,    4,     -2,   -12, 0);
+const [rightLegMesh,          rightLegMaterials] =          consructPartGeometry(4,    12,    4,     2,    -12, 0);
+const [leftLegOuterMesh,      leftLegOuterMaterials] =      consructPartOuterGeometry(4,    12,    4,     -2,   -12, 0);
+const [rightLegOuterMesh,     rightLegOuterMaterials] =     consructPartOuterGeometry(4,    12,    4,     2,    -12, 0);
 
 previewCamera.position.z = 30;
 
