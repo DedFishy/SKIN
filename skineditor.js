@@ -363,7 +363,7 @@ function applyBrushAt(x, y) {
 
     // Do for current view context
     context.fillStyle = "rgb(255 0 0)";
-    context.fillRect(x, y, brushSize, brushSize);
+    context.fillRect(x/width*editorCanvas.width, y/height*editorCanvas.width, brushSize/width*editorCanvas.width, brushSize/height*editorCanvas.width);
 
     // Do for full skin
     x += startX;
