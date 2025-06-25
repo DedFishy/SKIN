@@ -439,26 +439,39 @@ function applyTexArrayToMatArray(texArray, matArray) {
         value.map.magFilter = THREE.NearestFilter;
     });
 }
+function setOuterMeshVisibility(mesh, visible) {
+    mesh.forEach((value, index, array) => {
+        value.visible = visible;
+    });
+}
 function updatePreviewTexture() {
     const type = getSelectedType();
     if (type == "Slim") {
+
         leftArmMesh.visible = false;
         rightArmMesh.visible = false;
-        leftArmOuterMesh.visible = false;
-        rightArmOuterMesh.visible = false;
+
+        setOuterMeshVisibility(leftArmOuterMesh, false);
+        setOuterMeshVisibility(rightArmOuterMesh, false);
+
         rightArmSlimMesh.visible = true;
         leftArmSlimMesh.visible = true;
-        rightArmOuterSlimMesh.visible = true;
-        leftArmOuterSlimMesh.visible = true;
+
+        setOuterMeshVisibility(rightArmOuterSlimMesh, true);
+        setOuterMeshVisibility(leftArmOuterSlimMesh, true);
     } else {
+
         leftArmMesh.visible = true;
         rightArmMesh.visible = true;
-        leftArmOuterMesh.visible = true;
-        rightArmOuterMesh.visible = true;
+
+        setOuterMeshVisibility(leftArmOuterMesh, true);
+        setOuterMeshVisibility(rightArmOuterMesh, true);
+
         leftArmSlimMesh.visible = false;
         rightArmSlimMesh.visible = false;
-        leftArmOuterSlimMesh.visible = false;
-        rightArmOuterSlimMesh.visible = false;
+
+        setOuterMeshVisibility(rightArmOuterSlimMesh, false);
+        setOuterMeshVisibility(leftArmOuterSlimMesh, false);
     }
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Head"), headMaterials);
     applyTexArrayToMatArray(getPartAsCubeTextureArray("Outer", "Head"), headOuterMaterials);
@@ -577,28 +590,25 @@ const controls = new OrbitControls(previewCamera, renderer.domElement);
 const outerIncrease = 0.25;
 
 const defaultTexture = new THREE.Texture();
-//     Mesh Name              Material Name                                 Width Height Length X     Y    Z
-const [headMesh,              headMaterials] =              consructPartGeometry(8,    8,     8,     0,    10,  0);
-const [headOuterMesh,         headOuterMaterials] =         consructPartOuterGeometry(8, 8,  8,  0,    10,  0);
+//     Mesh Name         Material Name                                 Width Height Length X   Y    Z
+const [headMesh,         headMaterials] =         consructPartGeometry(8,    8,     8,     0,  10,  0);
+const [bodyMesh,         bodyMaterials] =         consructPartGeometry(8,    12,    4,     0,  0,   0);
+const [leftArmMesh,      leftArmMaterials] =      consructPartGeometry(4,    12,    4,     -6, 0,   0);
+const [rightArmMesh,     rightArmMaterials] =     consructPartGeometry(4,    12,    4,     6,  0,   0);
+const [leftArmSlimMesh,  leftArmSlimMaterials] =  consructPartGeometry(3,    12,    4,     -5.5, 0,   0);
+const [rightArmSlimMesh, rightArmSlimMaterials] = consructPartGeometry(3,    12,    4,     5.5,  0,   0);
+const [leftLegMesh,      leftLegMaterials] =      consructPartGeometry(4,    12,    4,     -2, -12, 0);
+const [rightLegMesh,     rightLegMaterials] =     consructPartGeometry(4,    12,    4,     2,  -12, 0);
 
-const [bodyMesh,              bodyMaterials] =              consructPartGeometry(8,    12,    4,     0,    0,   0);
-const [bodyOuterMesh,         bodyOuterMaterials] =         consructPartOuterGeometry(8, 12, 4,  0,    0,   0);
-
-const [leftArmMesh,           leftArmMaterials] =           consructPartGeometry(4,    12,    4,     -6,   0,   0);
-const [leftArmOuterMesh,      leftArmOuterMaterials] =      consructPartOuterGeometry(4, 12, 4, -6, 0, 0);
-
-const [rightArmMesh,          rightArmMaterials] =          consructPartGeometry(4,    12,    4,     6,    0,   0);
-const [rightArmOuterMesh,     rightArmOuterMaterials] =     consructPartOuterGeometry(4, 12, 4, 6, 0, 0);
-
-const [leftArmSlimMesh,       leftArmSlimMaterials] =       consructPartGeometry(3,    12,    4,     -5, 0,   0);
-const [leftArmOuterSlimMesh,  leftArmOuterSlimMaterials] =  consructPartOuterGeometry(3,    12,    4,     -5, 0,   0);
-const [rightArmSlimMesh,      rightArmSlimMaterials] =      consructPartGeometry(3,    12,    4,     5,  0,   0);
-const [rightArmOuterSlimMesh, rightArmOuterSlimMaterials] = consructPartOuterGeometry(3,    12,    4,     5,  0,   0);
-
-const [leftLegMesh,           leftLegMaterials] =           consructPartGeometry(4,    12,    4,     -2,   -12, 0);
-const [rightLegMesh,          rightLegMaterials] =          consructPartGeometry(4,    12,    4,     2,    -12, 0);
-const [leftLegOuterMesh,      leftLegOuterMaterials] =      consructPartOuterGeometry(4,    12,    4,     -2,   -12, 0);
-const [rightLegOuterMesh,     rightLegOuterMaterials] =     consructPartOuterGeometry(4,    12,    4,     2,    -12, 0);
+//     Mesh Name              Material Name                                           Width Height Length X   Y    Z
+const [headOuterMesh,         headOuterMaterials] =         consructPartOuterGeometry(8,    8,     8,     0,  10,  0);
+const [bodyOuterMesh,         bodyOuterMaterials] =         consructPartOuterGeometry(8,    12,    4,     0,  0,   0);
+const [leftArmOuterMesh,      leftArmOuterMaterials] =      consructPartOuterGeometry(4,    12,    4,     -6, 0,   0);
+const [rightArmOuterMesh,     rightArmOuterMaterials] =     consructPartOuterGeometry(4,    12,    4,     6,  0,   0);
+const [leftArmOuterSlimMesh,  leftArmOuterSlimMaterials] =  consructPartOuterGeometry(3,    12,    4,     -5.5, 0,   0);
+const [rightArmOuterSlimMesh, rightArmOuterSlimMaterials] = consructPartOuterGeometry(3,    12,    4,     5.5,  0,   0);
+const [leftLegOuterMesh,      leftLegOuterMaterials] =      consructPartOuterGeometry(4,    12,    4,     -2, -12, 0);
+const [rightLegOuterMesh,     rightLegOuterMaterials] =     consructPartOuterGeometry(4,    12,    4,     2,  -12, 0);
 
 previewCamera.position.z = 30;
 
