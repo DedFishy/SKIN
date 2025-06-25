@@ -11,6 +11,8 @@ const brushDrawSizeSlider = document.getElementById("brush-draw-size")
 
 const skinAccountNameInput = document.getElementById("skin-account-name");
 
+const brushColorInput = document.getElementById("brush-color");
+
 // Event Listeners
 document.getElementById("brush-draw-size").onchange = () => {updateBrushDrawSize()};
 document.getElementById("save-skin").onclick = () => {saveSkin()};
@@ -365,17 +367,25 @@ function saveSkin() {
     link.click();
 }
 
-function applyBrushAt(x, y) {
+function applyBrushAt(x, y, fill=true) {
 
     // Do for current view context
-    context.fillStyle = "rgb(255 0 0)";
-    context.fillRect(x/width*editorCanvas.width, y/height*editorCanvas.height, brushSize/width*editorCanvas.width, brushSize/height*editorCanvas.height);
+    context.fillStyle = brushColorInput.value;
+    if (fill) {
+        context.fillRect(x/width*editorCanvas.width, y/height*editorCanvas.height, brushSize/width*editorCanvas.width, brushSize/height*editorCanvas.height);
+    } else {
+        context.clearRect(x/width*editorCanvas.width, y/height*editorCanvas.height, brushSize/width*editorCanvas.width, brushSize/height*editorCanvas.height);
+    }
 
     // Do for full skin
     x += startX;
     y += startY;
-    fullSkinContext.fillStyle = "rgb(255 0 0)";
-    fullSkinContext.fillRect(x, y, brushSize, brushSize);
+    fullSkinContext.fillStyle = brushColorInput.value;
+    if (fill) {
+        fullSkinContext.fillRect(x, y, brushSize, brushSize);
+    } else {
+        fullSkinContext.clearRect(x, y, brushSize, brushSize);
+    }
 
     updatePreviewTexture();
 }
@@ -385,6 +395,13 @@ editorCanvas.onclick = function(e) {
     let pixelY = Math.floor((e.offsetY/editorCanvas.clientHeight)*height);
     console.log(pixelX, pixelY, e.offsetX, e.offsetY, width, height);
     applyBrushAt(pixelX, pixelY);
+}
+editorCanvas.oncontextmenu = function(e) {
+    e.preventDefault();
+    let pixelX = Math.floor((e.offsetX/editorCanvas.clientWidth)*width);
+    let pixelY = Math.floor((e.offsetY/editorCanvas.clientHeight)*height);
+    console.log(pixelX, pixelY, e.offsetX, e.offsetY, width, height);
+    applyBrushAt(pixelX, pixelY, false);
 }
 
 function updatePreviewSize() {
