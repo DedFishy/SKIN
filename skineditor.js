@@ -207,7 +207,7 @@ function loadSectionToCanvas() {
     context.canvas.width = width;
     context.canvas.height = height;
 
-    context.drawImage(loadedSkin, startX, startY, width, height, 0, 0, width, height);
+    context.drawImage(fullSkinCanvas, startX, startY, width, height, 0, 0, width, height);
 }
 
 function getSelectedLayer() {
@@ -231,8 +231,14 @@ function saveSkin() {
 }
 
 function applyBrushAt(x, y) {
+
+    // Do for current view context
     context.fillStyle = "rgb(255 0 0)";
     context.fillRect(x, y, 1, 1);
+
+    // Do for full skin
+    x += startX;
+    y += startY;
     fullSkinContext.fillStyle = "rgb(255 0 0)";
     fullSkinContext.fillRect(x, y, 1, 1);
 }

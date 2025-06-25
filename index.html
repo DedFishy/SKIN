@@ -14,7 +14,7 @@
         </div>
         <div id="right">
             <div id="canvas-options">
-                <form class="multioption">
+                <form class="multioption" onclick="loadSectionToCanvas()">
                     <p>Layer:</p>
                     <div class="multioption-pill">
                         <input type="radio" name="layer" id="layer-base" value="Base">
@@ -25,7 +25,7 @@
                         <label for="layer-outer">Outer</label>
                     </div>
                 </form>
-                <form class="multioption">
+                <form class="multioption" onclick="loadSectionToCanvas()">
                     <p>Side:</p>
                     <div class="multioption-pill">
                         <input type="radio" name="side" id="side-front" value="Front">
@@ -52,7 +52,7 @@
                         <label for="side-bottom">Bottom</label>
                     </div>
                 </form>
-                <form class="multioption">
+                <form class="multioption" onclick="loadSectionToCanvas()">
                     <p>Part:</p>
                     <div class="multioption-pill">
                         <input type="radio" name="part" id="part-head" value="Head">
@@ -80,6 +80,14 @@
                     </div>
                 </form>
 
+                <form class="multioption">
+                    <p>Brush:</p>
+                    <div class="multioption-pill">
+                        <input type="radio" name="brush" id="brush-draw" value="Draw">
+                        <label for="brush-draw">Draw</label>
+                    </div>
+                </form>
+                
                 
             </div>
             <div id="options-menu">
