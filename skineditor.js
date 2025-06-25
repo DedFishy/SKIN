@@ -310,21 +310,26 @@ function loadSectionToCanvas() {
     width = endX-startX;
     height = endY-startY;
 
+    console.log(dimensions, width, height);
+
     context.canvas.width = width;
     context.canvas.height = height;
 
-    const widthRatio = editorCanvasContainer.clientWidth / editorCanvas.clientWidth;
-    const heightRatio = editorCanvasContainer.clientHeight / editorCanvas.clientHeight;
 
-    const canvasRatio = editorCanvas.clientWidth / editorCanvas.clientHeight;
+    const maxWidth = editorCanvasContainer.clientWidth;
+    const maxHeight = editorCanvasContainer.clientHeight;
+    console.log("MAX", maxWidth, maxHeight);
 
-    console.log(widthRatio, heightRatio)
-    if (heightRatio > widthRatio) {
-        editorCanvas.width = editorCanvasContainer.clientWidth;
-        editorCanvas.height = editorCanvas.width * canvasRatio;
+    const sectionSizeRatio = width/height;
+    const canvasSizeRatio = maxWidth/maxHeight
+    console.log("SIZE RATIO SECTION, CANVAS", sectionSizeRatio, canvasSizeRatio);
+
+    if (canvasSizeRatio < sectionSizeRatio) { // Height is greater than width
+        context.canvas.width = maxWidth;
+        context.canvas.height = 1/sectionSizeRatio * maxWidth;
     } else {
-        editorCanvas.height = editorCanvasContainer.clientHeight;
-        editorCanvas.width = editorCanvas.height * canvasRatio;
+        context.canvas.height = maxHeight;
+        context.canvas.height = sectionSizeRatio * maxHeight;
     }
 
     context.imageSmoothingEnabled = false;
@@ -363,7 +368,7 @@ function applyBrushAt(x, y) {
 
     // Do for current view context
     context.fillStyle = "rgb(255 0 0)";
-    context.fillRect(x/width*editorCanvas.width, y/height*editorCanvas.width, brushSize/width*editorCanvas.width, brushSize/height*editorCanvas.width);
+    context.fillRect(x/width*editorCanvas.width, y/height*editorCanvas.height, brushSize/width*editorCanvas.width, brushSize/height*editorCanvas.height);
 
     // Do for full skin
     x += startX;
@@ -467,7 +472,7 @@ const controls = new OrbitControls(previewCamera, renderer.domElement);
 const defaultTexture = new THREE.Texture();
 
 const [headMesh, headMaterials] = consructPartGeometry(8, 8, 8, 0, 0, 0);
-const [bodyMesh, bodyMaterials] = consructPartGeometry(8, 12, 3, 0, 0, 0);
+const [bodyMesh, bodyMaterials] = consructPartGeometry(8, 12, 4, 0, 0, 0);
 const [leftArmMesh, leftArmMaterials] = consructPartGeometry()
 
 previewCamera.position.z = 15;
