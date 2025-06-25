@@ -11,6 +11,7 @@ let width = 0;
 let height = 0;
 
 var fullSkinCanvas;
+var fullSkinContext;
 var loadedSkin;
 
 loadURLAsCanvas("/default_skin.png");
@@ -176,13 +177,20 @@ skinDimensions = {
 
 function loadURLAsCanvas(url) {
     loadedSkin = new Image();
-    loadedSkin.onload = () => loadSectionToCanvas();
+    loadedSkin.onload = () => {
+        fullSkinContext.drawImage(loadedSkin, 0, 0);
+        loadSectionToCanvas();
+    }
     loadedSkin.src = url;
-    fullSkinCanvas = new OffscreenCanvas(loadedSkin.width, loadedSkin.height);
+    fullSkinCanvas = document.createElement("canvas");
+    fullSkinCanvas.width = loadedSkin.width;
+    fullSkinCanvas.height = loadedSkin.height;
+    fullSkinContext = fullSkinCanvas.getContext("2d");
     
 }
 
 function loadSectionToCanvas() {
+    
     let layer = getSelectedLayer();
     let side = getSelectedSide();
     let part = getSelectedPart();
@@ -215,9 +223,18 @@ function getSelectedPart() {
     if (input) return input.value;
 }
 
+function saveSkin() {
+    var link = document.createElement('a');
+    link.download = 'skin.png';
+    link.href = fullSkinCanvas.toDataURL()
+    link.click();
+}
+
 function applyBrushAt(x, y) {
     context.fillStyle = "rgb(255 0 0)";
-    context.fillRect(x, y, 1, 1)
+    context.fillRect(x, y, 1, 1);
+    fullSkinContext.fillStyle = "rgb(255 0 0)";
+    fullSkinContext.fillRect(x, y, 1, 1);
 }
 
 editorCanvas.onclick = function(e) {
@@ -226,11 +243,3 @@ editorCanvas.onclick = function(e) {
     console.log(pixelX, pixelY);
     applyBrushAt(pixelX, pixelY);
 }
-
-
-
-function renderEditor() {
-    
-    requestAnimationFrame(renderEditor);
-}
-renderEditor()
