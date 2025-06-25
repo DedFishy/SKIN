@@ -1,8 +1,19 @@
 const editorCanvas = document.getElementById("editor-canvas");
 const context = editorCanvas.getContext("2d");
 
-var loadedSkin = new Image();
-loadedSkin.src = "/default_skin.png";
+
+
+let startX = 0
+let startY = 0
+let endX = 0
+let endY = 0
+let width = 0;
+let height = 0;
+
+var fullSkinCanvas;
+var loadedSkin;
+
+loadURLAsCanvas("/default_skin.png");
 
 skinDimensions = {
     "Head": {
@@ -11,7 +22,7 @@ skinDimensions = {
             "Outer": [40,0,47,7]
         },
         "Bottom": {
-            "Base": [17,0,23,7],
+            "Base": [16,0,23,7],
             "Outer": [48,0,55,7]
         },
         "Left": {
@@ -163,13 +174,32 @@ skinDimensions = {
     }
 }
 
+function loadURLAsCanvas(url) {
+    loadedSkin = new Image();
+    loadedSkin.onload = () => loadSectionToCanvas();
+    loadedSkin.src = url;
+    fullSkinCanvas = new OffscreenCanvas(loadedSkin.width, loadedSkin.height);
+    
+}
+
 function loadSectionToCanvas() {
     let layer = getSelectedLayer();
     let side = getSelectedSide();
     let part = getSelectedPart();
+    if ([layer, side, part].includes(undefined)) return;
 
-    context.canvas.width = editorCanvas.offsetWidth;
-    context.canvas.height = editorCanvas.offsetHeight;
+    let dimensions = skinDimensions[part][side][layer];
+    startX = dimensions[0];
+    startY = dimensions[1];
+    endX = dimensions[2]+1;
+    endY = dimensions[3]+1;
+    width = endX-startX;
+    height = endY-startY;
+
+    context.canvas.width = width;
+    context.canvas.height = height;
+
+    context.drawImage(loadedSkin, startX, startY, width, height, 0, 0, width, height);
 }
 
 function getSelectedLayer() {
@@ -185,11 +215,22 @@ function getSelectedPart() {
     if (input) return input.value;
 }
 
+function applyBrushAt(x, y) {
+    context.fillStyle = "rgb(255 0 0)";
+    context.fillRect(x, y, 1, 1)
+}
+
+editorCanvas.onclick = function(e) {
+    let pixelX = Math.floor((e.offsetX/editorCanvas.clientWidth)*width);
+    let pixelY = Math.floor((e.offsetY/editorCanvas.clientHeight)*height);
+    console.log(pixelX, pixelY);
+    applyBrushAt(pixelX, pixelY);
+}
+
+
+
 function renderEditor() {
-    context.fillStyle = "rgb(200 0 0)";
-    context.fillRect(10, 10, 50, 50);
-    context.fillStyle = "rgb(0 0 200 / 50%)";
-    context.fillRect(30, 30, 50, 50);
+    
     requestAnimationFrame(renderEditor);
 }
 renderEditor()
