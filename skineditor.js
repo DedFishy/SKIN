@@ -1,12 +1,24 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const editorCanvas = document.getElementById("editor-canvas");
+const editorCanvasContainer = document.getElementById("editor-canvas-container");
 const context = editorCanvas.getContext("2d");
+
+const previewContainer = document.getElementById("preview");
 
 const brushDrawSizeSlider = document.getElementById("brush-draw-size")
 
+const skinAccountNameInput = document.getElementById("skin-account-name");
+
 // Event Listeners
 document.getElementById("brush-draw-size").onchange = () => {updateBrushDrawSize()};
+document.getElementById("save-skin").onclick = () => {saveSkin()};
+document.getElementById("load-skin-from-account").onclick = () => {loadURLAsCanvas("https://mineskin.eu/skin/" + skinAccountNameInput.value)};
+
+document.body.onload = () => {
+    updatePreviewSize();
+}
 
 const multioptions = document.getElementsByClassName("multioption");
 for(let i = 0; i < multioptions.length; i++) {
@@ -26,7 +38,7 @@ var loadedSkin;
 
 var brushSize = 1;
 
-loadURLAsCanvas("/default_skin.png");
+loadURLAsCanvas("/default_skin3.png");
 
 const skinDimensions = {
     "Head": {
@@ -83,54 +95,126 @@ const skinDimensions = {
     },
     "Left Arm": {
         "Top": {
-            "Base": [44,16,47,19],
-            "Outer": [44,32,47,35]
+            "Classic": {
+                "Base": [44,16,47,19],
+                "Outer": [44,32,47,35]
+            },
+            "Slim": {
+                "Base": [44,16,46,19],
+                "Outer": [44,32,46,35]
+            }
         },
         "Bottom": {
-            "Base": [48,16,51,19],
-            "Outer": [48,32,51,35]
+            "Classic": {
+                "Base": [48,16,51,19],
+                "Outer": [48,32,51,35]
+            },
+            "Slim": {
+                "Base": [47,16,49,19],
+                "Outer": [47,32,49,35]
+            }
         },
         "Left": {
-            "Base": [40,20,43,31],
-            "Outer": [40,36,43,47]
+            "Classic": {
+                "Base": [40,20,43,31],
+                "Outer": [40,36,43,47]
+            },
+            "Slim": {
+                "Base": [40,20,43,31],
+                "Outer": [40,36,43,47]
+            }
         },
         "Right": {
-            "Base": [52,20,55,31],
-            "Outer": [52,36,55,47]
+            "Classic": {
+                "Base": [52,20,55,31],
+                "Outer": [52,36,55,47]
+            },
+            "Slim": {
+                "Base": [50,20,53,31],
+                "Outer": [50,36,53,47]
+            }
         },
         "Front": {
-            "Base": [44,20,47,31],
-            "Outer": [44,36,47,47]
+            "Classic": {
+                "Base": [44,20,47,31],
+                "Outer": [44,36,47,47]
+            },
+            "Slim": {
+                "Base": [44,20,46,31],
+                "Outer": [44,36,46,47]
+            }
         },
         "Back": {
-            "Base": [48,20,51,31],
-            "Outer": [48,36,51,47]
+            "Classic": {
+                "Base": [48,20,51,31],
+                "Outer": [48,36,51,47]
+            },
+            "Slim": {
+                "Base": [47,20,49,31],
+                "Outer": [47,36,49,47]
+            }
         }
     },
     "Right Arm": {
         "Top": {
-            "Base": [36,48,39,51],
-            "Outer": [52,48,55,51]
+            "Classic": {
+                "Base": [36,48,39,51],
+                "Outer": [52,48,55,51]
+            },
+            "Slim": {
+                "Base": [36,48,38,51],
+                "Outer": [52,48,54,51]
+            }
         },
         "Bottom": {
-            "Base": [40,48,43,51],
-            "Outer": [56,48,59,51]
+            "Classic": {
+                "Base": [40,48,43,51],
+                "Outer": [56,48,59,51]
+            },
+            "Slim": {
+                "Base": [39,48,41,51],
+                "Outer": [55,48,57,51]
+            }
         },
         "Left": {
-            "Base": [32,52,35,63],
-            "Outer": [48,52,51,63]
+            "Classic": {
+                "Base": [32,52,35,63],
+                "Outer": [48,52,51,63]
+            },
+            "Slim": {
+                "Base": [32,52,35,63],
+                "Outer": [48,52,51,63]
+            }
         },
         "Right": {
-            "Base": [28,52,31,63],
-            "Outer": [60,52,63,63]
+            "Classic": {
+                "Base": [28,52,31,63],
+                "Outer": [60,52,63,63]
+            },
+            "Slim": {
+                "Base": [28,52,31,63],
+                "Outer": [60,52,63,63]
+            }
         },
         "Front": {
-            "Base": [36,52,39,63],
-            "Outer": [52,52,55,63]
+            "Classic": {
+                "Base": [36,52,39,63],
+                "Outer": [52,52,55,63]
+            },
+            "Slim": {
+                "Base": [36,52,38,63],
+                "Outer": [55,52,57,63]
+            }
         },
         "Back": {
-            "Base": [44,52,47,63],
-            "Outer": [60,52,63,63]
+            "Classic": {
+                "Base": [44,52,47,63],
+                "Outer": [60,52,63,63]
+            },
+            "Slim": {
+                "Base": [39,52,41,63],
+                "Outer": [55,52,57,63]
+            }
         }
     },
     "Left Leg": {
@@ -189,11 +273,13 @@ const skinDimensions = {
 
 function loadURLAsCanvas(url) {
     loadedSkin = new Image();
+    loadedSkin.crossOrigin = "anonymous";
     loadedSkin.onload = () => {
         fullSkinCanvas.width = loadedSkin.width;
         fullSkinCanvas.height = loadedSkin.height;
         fullSkinContext.drawImage(loadedSkin, 0, 0);
         loadSectionToCanvas();
+        updatePreviewTexture();     
     }
     loadedSkin.src = url;
     fullSkinCanvas = document.createElement("canvas");
@@ -206,14 +292,17 @@ function updateBrushDrawSize() {
     brushSize = Number(brushDrawSizeSlider.value);
 }
 
+
+
 function loadSectionToCanvas() {
     
     let layer = getSelectedLayer();
     let side = getSelectedSide();
     let part = getSelectedPart();
-    if ([layer, side, part].includes(undefined)) return;
+    let type = getSelectedType();
+    if ([layer, side, part, type].includes(undefined)) return;
 
-    let dimensions = skinDimensions[part][side][layer];
+    let dimensions = part.includes("Arm") ? skinDimensions[part][side][type][layer] : skinDimensions[part][side][layer];
     startX = dimensions[0];
     startY = dimensions[1];
     endX = dimensions[2]+1;
@@ -224,7 +313,25 @@ function loadSectionToCanvas() {
     context.canvas.width = width;
     context.canvas.height = height;
 
-    context.drawImage(fullSkinCanvas, startX, startY, width, height, 0, 0, width, height);
+    const widthRatio = editorCanvasContainer.clientWidth / editorCanvas.clientWidth;
+    const heightRatio = editorCanvasContainer.clientHeight / editorCanvas.clientHeight;
+
+    const canvasRatio = editorCanvas.clientWidth / editorCanvas.clientHeight;
+
+    console.log(widthRatio, heightRatio)
+    if (heightRatio > widthRatio) {
+        editorCanvas.width = editorCanvasContainer.clientWidth;
+        editorCanvas.height = editorCanvas.width * canvasRatio;
+    } else {
+        editorCanvas.height = editorCanvasContainer.clientHeight;
+        editorCanvas.width = editorCanvas.height * canvasRatio;
+    }
+
+    context.imageSmoothingEnabled = false;
+
+    context.drawImage(fullSkinCanvas, startX, startY, width, height, 0, 0, editorCanvas.width, editorCanvas.height);
+
+    
 }
 
 function getSelectedLayer() {
@@ -237,6 +344,11 @@ function getSelectedSide() {
 }
 function getSelectedPart() {
     var input = document.querySelector('input[name="part"]:checked');
+    if (input) return input.value;
+}
+
+function getSelectedType() {
+    var input = document.querySelector('input[name="type"]:checked');
     if (input) return input.value;
 }
 
@@ -258,14 +370,115 @@ function applyBrushAt(x, y) {
     y += startY;
     fullSkinContext.fillStyle = "rgb(255 0 0)";
     fullSkinContext.fillRect(x, y, brushSize, brushSize);
+
+    updatePreviewTexture();
 }
 
 editorCanvas.onclick = function(e) {
     let pixelX = Math.floor((e.offsetX/editorCanvas.clientWidth)*width);
     let pixelY = Math.floor((e.offsetY/editorCanvas.clientHeight)*height);
-    console.log(pixelX, pixelY);
+    console.log(pixelX, pixelY, e.offsetX, e.offsetY, width, height);
     applyBrushAt(pixelX, pixelY);
 }
 
+function updatePreviewSize() {
+    let previewWidth = previewContainer.clientWidth;
+    let previewHeight = previewContainer.clientHeight;
+    renderer.setSize(previewWidth, previewHeight);
+    previewCamera.aspect = (previewWidth/previewHeight);
+    previewCamera.updateProjectionMatrix();
+}
+function getSectionAsURL(layer, side, part, type) {
+    if ([layer, side, part, type].includes(undefined)) return;
+
+    let dimensions = part.includes("Arm") ? skinDimensions[part][side][type][layer] : skinDimensions[part][side][layer];
+    const startX = dimensions[0];
+    const startY = dimensions[1];
+    const endX = dimensions[2]+1;
+    const endY = dimensions[3]+1;
+    const width = endX-startX;
+    const height = endY-startY;
+
+    const canvas = document.createElement("canvas");
+    const canvasContext = canvas.getContext("2d");
+
+    canvas.width = width;
+    canvas.height = height;
+
+    canvasContext.drawImage(fullSkinCanvas, startX, startY, width, height, 0, 0, width, height);
+    return canvas.toDataURL();
+}
+function getPartAsCubeTextureArray(layer, part) {
+    const type = getSelectedType();
+    const get = (side) => {return getSectionAsURL(layer, side, part, type)};
+
+    return [
+        loader.load(get("Right")),
+        loader.load(get("Left")),
+        loader.load(get("Top")),
+        loader.load(get("Bottom")),
+        loader.load(get("Front")),
+        loader.load(get("Back")),
+    ];
+
+}
+function applyTexArrayToMatArray(texArray, matArray) {
+    matArray.forEach((value, index, array) => {
+        value.map = texArray[index];
+        value.map.minFilter = THREE.NearestFilter;
+        value.map.magFilter = THREE.NearestFilter;
+    });
+}
+function updatePreviewTexture() {
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Head"), headMaterials);
+    applyTexArrayToMatArray(getPartAsCubeTextureArray("Base", "Body"), bodyMaterials);
+}
+
+function consructPartGeometry(width, height, depth, x, y, z) {
+    const geometry = new THREE.BoxGeometry(width, height, depth);
+    const materials = [
+        new THREE.MeshBasicMaterial({map: defaultTexture}),
+        new THREE.MeshBasicMaterial({map: defaultTexture}),
+        new THREE.MeshBasicMaterial({map: defaultTexture}),
+        new THREE.MeshBasicMaterial({map: defaultTexture}),
+        new THREE.MeshBasicMaterial({map: defaultTexture}),
+        new THREE.MeshBasicMaterial({map: defaultTexture})
+    ]
+    const mesh = new THREE.Mesh(geometry, materials);
+    preview.add(mesh);
+    return [mesh, materials];
+}
+
+const loader = new THREE.TextureLoader();
+
 const preview = new THREE.Scene();
-const previewCamera = new THREE.PerspectiveCamera()
+preview.background = new THREE.Color().setHex(0xffffff);
+const previewCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(100, 100);
+previewContainer.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(previewCamera, renderer.domElement);
+
+//const light = new THREE.AmbientLight( 0xffffff ); // soft white light
+//preview.add( light );
+
+const defaultTexture = new THREE.Texture();
+
+const [headMesh, headMaterials] = consructPartGeometry(8, 8, 8, 0, 0, 0);
+const [bodyMesh, bodyMaterials] = consructPartGeometry(8, 12, 3, 0, 0, 0);
+const [leftArmMesh, leftArmMaterials] = consructPartGeometry()
+
+previewCamera.position.z = 15;
+
+controls.update();
+
+updatePreviewSize();
+
+function renderPreview() {
+    controls.update();
+    renderer.render( preview, previewCamera );
+    updatePreviewSize();
+}
+renderer.setAnimationLoop( renderPreview );

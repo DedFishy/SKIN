@@ -81,6 +81,18 @@
                 </form>
 
                 <form class="multioption">
+                    <p>Type:</p>
+                    <div class="multioption-pill">
+                        <input type="radio" name="type" id="type-classic" value="Classic" checked>
+                        <label for="type-classic">Classic</label>
+                    </div>
+                    <div class="multioption-pill">
+                        <input type="radio" name="type" id="type-slim" value="Slim">
+                        <label for="type-slim">Slim</label>
+                    </div>
+                </form>
+
+                <form class="multioption">
                     <p>Brush:</p>
                     <div class="multioption-pill">
                         <input type="radio" name="brush" id="brush-draw" value="Draw">
@@ -104,9 +116,9 @@
             </div>
             <div id="options-menu">
                 <button>Open</button>
-                <button onclick="saveSkin()">Save</button>
-                <input type="text" placeholder="Name">
-                <button>Load From Account</button>
+                <button id="save-skin">Save</button>
+                <input type="text" placeholder="Name" id="skin-account-name">
+                <button id="load-skin-from-account">Load From Account</button>
             </div>
             <div id="preview">
 
