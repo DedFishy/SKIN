@@ -371,10 +371,15 @@ function applyBrushAt(x, y, fill=true) {
 
     // Do for current view context
     context.fillStyle = brushColorInput.value;
+    const editorBoundX = Math.floor(x/width*editorCanvas.width);
+    const editorBoundY = Math.floor(y/height*editorCanvas.height);
+    const editorBrushWidth = Math.ceil(brushSize/width*editorCanvas.width);
+    const editorBrushHeight = Math.ceil(brushSize/height*editorCanvas.height);
+    console.log(editorBoundX, editorBoundY, editorBrushWidth, editorBrushHeight)
     if (fill) {
-        context.fillRect(x/width*editorCanvas.width, y/height*editorCanvas.height, brushSize/width*editorCanvas.width, brushSize/height*editorCanvas.height);
+        context.fillRect(editorBoundX, editorBoundY, editorBrushWidth, editorBrushHeight);
     } else {
-        context.clearRect(x/width*editorCanvas.width, y/height*editorCanvas.height, brushSize/width*editorCanvas.width, brushSize/height*editorCanvas.height);
+        context.clearRect(editorBoundX, editorBoundY, editorBrushWidth, editorBrushHeight);
     }
 
     // Do for full skin
