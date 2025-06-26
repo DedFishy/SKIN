@@ -15,12 +15,18 @@ const brushColorInput = document.getElementById("brush-color");
 
 // Event Listeners
 document.getElementById("brush-draw-size").onchange = () => {updateBrushDrawSize()};
+document.getElementById("open-skin").onclick = () => {openSkin()};
 document.getElementById("save-skin").onclick = () => {saveSkin()};
 document.getElementById("load-skin-from-account").onclick = () => {loadURLAsCanvas("https://mineskin.eu/skin/" + skinAccountNameInput.value)};
 
 
 document.body.onload = () => {
     updatePreviewSize();
+}
+document.body.onresize = () => {
+    updatePreviewSize();
+    loadSectionToCanvas();
+    
 }
 
 const multioptions = document.getElementsByClassName("multioption");
@@ -382,14 +388,17 @@ function applyBrushAt(x, y, fill=true) {
         context.clearRect(editorBoundX, editorBoundY, editorBrushWidth, editorBrushHeight);
     }
 
+    const maxFillWidth = width - editorBoundX;
+    const maxFillHeight = height - editorBoundY;
+
     // Do for full skin
     x += startX;
     y += startY;
     fullSkinContext.fillStyle = brushColorInput.value;
     if (fill) {
-        fullSkinContext.fillRect(x, y, brushSize, brushSize);
+        fullSkinContext.fillRect(x, y, Math.min(brushSize, maxFillWidth), Math.min(brushSize, maxFillHeight));
     } else {
-        fullSkinContext.clearRect(x, y, brushSize, brushSize);
+        fullSkinContext.clearRect(x, y, Math.min(brushSize, maxFillWidth), Math.min(brushSize, maxFillHeight));
     }
 
     updatePreviewTexture();
@@ -448,6 +457,9 @@ function getPartAsCubeTextureArray(layer, part) {
         loader.load(get("Front")),
         loader.load(get("Back")),
     ];
+    textures.forEach((value, index, array) => {
+        value.colorSpace = THREE.SRGBColorSpace;
+    })
     if (layer != "Outer") {
         textures[3].flipY = false;
     }
@@ -600,7 +612,7 @@ const preview = new THREE.Scene();
 //preview.background = new THREE.Color().setHex(0xffffff);
 const previewCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({alpha: true});
 renderer.setSize(100, 100);
 previewContainer.appendChild(renderer.domElement);
 

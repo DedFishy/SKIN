@@ -1,5 +1,6 @@
 :root {
-    --background-color: black;
+    --background-color: rgb(20, 20, 20);
+    --secondary-background-color: #3d3d3d;
     --accent-color: yellow;
 }
 
@@ -14,6 +15,22 @@ body {
     font-family: sans-serif;
 }
 
+input, button {
+    border: none;
+    border-radius: 10px;
+    background-color: var(--accent-color);
+    outline: none;
+    padding: 6px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+input[type="text"] {
+    border-radius: 5px;
+    box-shadow: inset 0 0 10px black;
+}
+label {
+    margin: 5px;
+}
 .multioption-hidden {
     display: none;
 }
@@ -22,7 +39,10 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     height: 100vh;
+    width: 50vw;
 }
 #editor-canvas-container {
     width: 50vw;
@@ -38,9 +58,42 @@ body {
     display: block;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+    background-image: url("/transparency-checker.svg");
+    background-size: 10%;
+    box-shadow: 0 0 10px black;
 }
 #preview {
     flex-grow: 1;
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: inset 0 0 20px black;
+    overflow: hidden;
+    background-image: url("/preview-background.png");
+    background-size: cover;
+    background-position: center;
+}
+#tag-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+h1, h2, h3 {
+    margin: 0;
+}
+#options-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.options-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .multioption {
@@ -49,9 +102,12 @@ body {
     align-items: center;
     margin: 5px;
     user-select: none;
+    flex-wrap: wrap;
+    background-color: var(--secondary-background-color);
+    border-radius: 10px;
 }
 .multioption p {
-    margin: 0;
+    margin: 5px;
     padding: 0;
     font-weight: bold;
 }
@@ -70,10 +126,15 @@ body {
 .multioption-pill:has(input:checked) {
     background-color: var(--accent-color);
     color: black;
+    box-shadow: 0 0 10px black;
 }
 
 /* ALL of the multiselector appearing options (I see why people like CSS libraries...) */
 .multioption:has(.multioption-pill #brush-draw[type="radio"]:checked) ~ .brush-option {
     display: flex;
     flex-direction: row;
+}
+
+.brush-option {
+    align-items: center;
 }
