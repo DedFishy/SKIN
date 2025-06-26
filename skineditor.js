@@ -338,19 +338,15 @@ function loadSectionToCanvas() {
     width = endX-startX;
     height = endY-startY;
 
-    console.log(dimensions, width, height);
-
     context.canvas.width = width;
     context.canvas.height = height;
 
 
     const maxWidth = editorCanvasContainer.clientWidth;
     const maxHeight = editorCanvasContainer.clientHeight;
-    console.log("MAX", maxWidth, maxHeight);
 
     const sectionSizeRatio = width/height;
     const canvasSizeRatio = maxWidth/maxHeight
-    console.log("SIZE RATIO SECTION, CANVAS", sectionSizeRatio, canvasSizeRatio);
 
     if (canvasSizeRatio < sectionSizeRatio) { // Height is greater than width
         context.canvas.width = maxWidth;
@@ -396,7 +392,10 @@ function saveSkin() {
     link.href = fullSkinCanvas.toDataURL()
     link.click();
 }
-
+function getHexPixelAt(x, y) {
+    const pixelData = fullSkinContext.getImageData(x, y, 1, 1).data;
+    return rgbToHex(pixelData[0],pixelData[1], pixelData[2]);
+}
 function applyBrushAt(x, y, fill=true) {
 
     const brush = getSelectedBrush();
@@ -408,14 +407,14 @@ function applyBrushAt(x, y, fill=true) {
     x += startX;
     y += startY;
 
+    const maxFillWidth = (width - (editorBoundX/editorCanvas.width));
+    const maxFillHeight = (height - (editorBoundY/editorCanvas.height));
+
     if (brush == "Draw") {
 
-        const maxFillWidth = (width - (editorBoundX/editorCanvas.width));
-        const maxFillHeight = (height - (editorBoundY/editorCanvas.height));
 
         
         fullSkinContext.fillStyle = brushColorInput.value;
-        console.log(Math.min(brushSize, maxFillWidth), Math.min(brushSize, maxFillHeight))
         if (fill) {
             fullSkinContext.fillRect(x, y, Math.min(brushSize, maxFillWidth), Math.min(brushSize, maxFillHeight));
         } else {
@@ -424,9 +423,43 @@ function applyBrushAt(x, y, fill=true) {
 
 
     } else if (brush == "Eyedropper") {
-        const pixelData = fullSkinContext.getImageData(x, y, 1, 1).data;
-        console.log(pixelData);
-        brushColorInput.value = rgbToHex(pixelData[0],pixelData[1], pixelData[2]);
+        brushColorInput.value = getHexPixelAt(x, y);
+    } else if (brush == "Bucket") {
+        const colorToFill = getHexPixelAt(x, y);
+        if (colorToFill == brushColorInput.value) return;
+
+        var checked = []
+
+        const fillAt = (x, y) => {
+            console.log(x-startX, y-startY, width, height);
+            //console.log(checked)
+            const editorSpaceX = x-startX;
+            const editorSpaceY = y-startY;
+            if (editorSpaceX < 0) return;
+            if (editorSpaceY < 0) return;
+            if (editorSpaceX > width) return;
+            if (editorSpaceY > height) return;
+            if (checked.includes([x, y])) return;
+            
+            checked.push([x, y]);
+            if (getHexPixelAt(x, y) == colorToFill) {
+                fillPixel(x, y);
+            } else {
+                //console.log("Didn't fill", x, ":", y, "because it is", getHexPixelAt(x, y), "while the target color is", colorToFill);
+            }
+        }
+
+        const fillPixel = (x_coord, y_coord) => {
+            console.log(x_coord, y_coord)
+            fullSkinContext.fillRect(x_coord, y_coord, 1, 1);
+            
+
+            fillAt(x_coord-1, y_coord);
+            fillAt(x_coord+1, y_coord);
+            fillAt(x_coord, y_coord+1);
+            fillAt(x_coord, y_coord-1);
+        }
+        fillPixel(x, y);
     }
 
     updatePreviewTexture();
@@ -436,14 +469,12 @@ function applyBrushAt(x, y, fill=true) {
 editorCanvas.onclick = function(e) {
     let pixelX = Math.floor((e.offsetX/editorCanvas.clientWidth)*width);
     let pixelY = Math.floor((e.offsetY/editorCanvas.clientHeight)*height);
-    console.log(pixelX, pixelY, e.offsetX, e.offsetY, width, height);
     applyBrushAt(pixelX, pixelY);
 }
 editorCanvas.oncontextmenu = function(e) {
     e.preventDefault();
     let pixelX = Math.floor((e.offsetX/editorCanvas.clientWidth)*width);
     let pixelY = Math.floor((e.offsetY/editorCanvas.clientHeight)*height);
-    console.log(pixelX, pixelY, e.offsetX, e.offsetY, width, height);
     applyBrushAt(pixelX, pixelY, false);
 }
 
