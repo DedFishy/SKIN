@@ -15,7 +15,7 @@ body {
     font-family: sans-serif;
 }
 
-input, button {
+input, button, input::file-selector-button {
     border: none;
     border-radius: 10px;
     background-color: var(--accent-color);
@@ -23,6 +23,13 @@ input, button {
     padding: 6px;
     margin-top: 4px;
     margin-bottom: 4px;
+    color: black;
+}
+input[type="file"] {
+    background-color: transparent;
+    color: white;
+    margin: 0;
+    padding: 0;
 }
 input[type="text"] {
     border-radius: 5px;

@@ -15,9 +15,9 @@ const brushColorInput = document.getElementById("brush-color");
 
 // Event Listeners
 document.getElementById("brush-draw-size").onchange = () => {updateBrushDrawSize()};
-document.getElementById("open-skin").onclick = () => {openSkin()};
 document.getElementById("save-skin").onclick = () => {saveSkin()};
 document.getElementById("load-skin-from-account").onclick = () => {loadURLAsCanvas("https://mineskin.eu/skin/" + skinAccountNameInput.value)};
+document.getElementById("open-skin").onchange = (event) => {loadFileEvent(event.target)};
 
 
 document.body.onload = () => {
@@ -295,7 +295,19 @@ function loadURLAsCanvas(url) {
     
     fullSkinContext = fullSkinCanvas.getContext("2d");
 }
-
+function loadFileEvent(fileElement) {
+    const selectedFile = fileElement.files[0]; // Access the first selected file
+        if (selectedFile) {
+            var reader = new FileReader();
+            reader.onload = function(event){
+                
+                loadURLAsCanvas(event.target.result);
+            }
+            reader.readAsDataURL(fileElement.files[0]);
+        } else {
+            console.log('No file selected.');
+        }
+}
 
 function updateBrushDrawSize() {
     brushSize = Number(brushDrawSizeSlider.value);
