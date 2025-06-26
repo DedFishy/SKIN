@@ -403,27 +403,17 @@ function applyBrushAt(x, y, fill=true) {
 
     context.fillStyle = brushColorInput.value;
     const editorBoundX = Math.floor(x/width*editorCanvas.width);
-    const editorBoundY = Math.floor(y/height*editorCanvas.height)+1;
-    const editorBrushWidth = Math.ceil(brushSize/width*editorCanvas.width) ;
-    const editorBrushHeight = Math.ceil(brushSize/height*editorCanvas.height);
-    console.log(editorBoundX, editorBoundY, editorBrushWidth, editorBrushHeight)
+    const editorBoundY = Math.floor(y/height*editorCanvas.height);
+
+    x += startX;
+    y += startY;
 
     if (brush == "Draw") {
-
-        // Do for current view context
-        
-        if (fill) {
-            context.fillRect(editorBoundX, editorBoundY, editorBrushWidth, editorBrushHeight);
-        } else {
-            context.clearRect(editorBoundX, editorBoundY, editorBrushWidth, editorBrushHeight);
-        }
 
         const maxFillWidth = (width - (editorBoundX/editorCanvas.width));
         const maxFillHeight = (height - (editorBoundY/editorCanvas.height));
 
-        // Do for full skin
-        x += startX;
-        y += startY;
+        
         fullSkinContext.fillStyle = brushColorInput.value;
         console.log(Math.min(brushSize, maxFillWidth), Math.min(brushSize, maxFillHeight))
         if (fill) {
@@ -431,13 +421,16 @@ function applyBrushAt(x, y, fill=true) {
         } else {
             fullSkinContext.clearRect(x, y, Math.min(brushSize, maxFillWidth), Math.min(brushSize, maxFillHeight));
         }
+
+
     } else if (brush == "Eyedropper") {
-        const pixelData = context.getImageData(editorBoundX, editorBoundY, 1, 1).data;
+        const pixelData = fullSkinContext.getImageData(x, y, 1, 1).data;
         console.log(pixelData);
         brushColorInput.value = rgbToHex(pixelData[0],pixelData[1], pixelData[2]);
     }
 
     updatePreviewTexture();
+    loadSectionToCanvas();
 }
 
 editorCanvas.onclick = function(e) {
