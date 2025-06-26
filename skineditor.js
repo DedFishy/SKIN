@@ -403,7 +403,7 @@ function applyBrushAt(x, y, fill=true) {
 
     context.fillStyle = brushColorInput.value;
     const editorBoundX = Math.floor(x/width*editorCanvas.width);
-    const editorBoundY = Math.floor(y/height*editorCanvas.height);
+    const editorBoundY = Math.floor(y/height*editorCanvas.height)+1;
     const editorBrushWidth = Math.ceil(brushSize/width*editorCanvas.width) ;
     const editorBrushHeight = Math.ceil(brushSize/height*editorCanvas.height);
     console.log(editorBoundX, editorBoundY, editorBrushWidth, editorBrushHeight)
@@ -418,13 +418,14 @@ function applyBrushAt(x, y, fill=true) {
             context.clearRect(editorBoundX, editorBoundY, editorBrushWidth, editorBrushHeight);
         }
 
-        const maxFillWidth = (width - editorBoundX)/width;
-        const maxFillHeight = (height - editorBoundY)/width;
+        const maxFillWidth = (width - (editorBoundX/editorCanvas.width));
+        const maxFillHeight = (height - (editorBoundY/editorCanvas.height));
 
         // Do for full skin
         x += startX;
         y += startY;
         fullSkinContext.fillStyle = brushColorInput.value;
+        console.log(Math.min(brushSize, maxFillWidth), Math.min(brushSize, maxFillHeight))
         if (fill) {
             fullSkinContext.fillRect(x, y, Math.min(brushSize, maxFillWidth), Math.min(brushSize, maxFillHeight));
         } else {
