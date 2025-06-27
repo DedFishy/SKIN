@@ -445,6 +445,7 @@ function applyBrushAt(x, y, fill=true) {
         brushColorInput.value = getHexPixelAt(x, y);
     } else if (brush == "Bucket") {
         const colorToFill = getHexPixelAt(x, y);
+        console.log(colorToFill, brushColorInput.value, fullSkinContext.fillStyle);
         if (colorToFill == brushColorInput.value) return;
 
         var checked = []
@@ -479,14 +480,29 @@ function applyBrushAt(x, y, fill=true) {
         fillPixel(x, y);
     }
 
-    updatePreviewTexture();
     loadSectionToCanvas();
 }
 
-editorCanvas.onclick = function(e) {
+function applyBrush(e) {
     let pixelX = Math.floor((e.offsetX/editorCanvas.clientWidth)*width);
     let pixelY = Math.floor((e.offsetY/editorCanvas.clientHeight)*height);
     applyBrushAt(pixelX, pixelY);
+}
+
+var isCurrentlyDrawing = false;
+editorCanvas.onmousedown = function(e) {
+    isCurrentlyDrawing = true;
+    applyBrush(e);
+}
+editorCanvas.onmousemove = function(e) {
+    if (isCurrentlyDrawing) {
+        applyBrush(e);
+    }
+}
+document.onmouseup = function(e) {
+    isCurrentlyDrawing = false;
+
+    updatePreviewTexture();
 }
 editorCanvas.oncontextmenu = function(e) {
     e.preventDefault();
