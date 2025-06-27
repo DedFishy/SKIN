@@ -1,25 +1,21 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-
-
+// Editor constants
 const editorCanvas = document.getElementById("editor-canvas");
 const editorCanvasContainer = document.getElementById("editor-canvas-container");
 const context = editorCanvas.getContext("2d");
 
+// Element constants
 const previewContainer = document.getElementById("preview");
-
 const brushDrawSizeSlider = document.getElementById("brush-draw-size")
-
 const skinAccountNameInput = document.getElementById("skin-account-name");
-
 const brushColorInput = document.getElementById("brush-color");
-
 const messageBox = document.getElementById("message-box");
 const messageBoxContent = document.getElementById("message-box-content");
-
 const brushSizeSlider = document.getElementById("brush-draw-size")
 
+// Tutorial hidey showey
 var hasSeenTutorial = localStorage.getItem("hasSeenTutorial");
 if (hasSeenTutorial == null) {
     hasSeenTutorial = false;
@@ -35,8 +31,6 @@ document.getElementById("save-skin").onclick = () => {saveSkin()};
 document.getElementById("load-skin-from-account").onclick = () => {loadURLAsCanvas("https://mineskin.eu/skin/" + skinAccountNameInput.value)};
 document.getElementById("open-skin").onchange = (event) => {loadFileEvent(event.target)};
 document.getElementById("message-box-acknowledge").onclick = (event) => {messageBox.classList.remove("visible"); localStorage.setItem("hasSeenTutorial", "yes")};
-
-
 document.body.onload = () => {
     updatePreviewSize();
 }
@@ -45,8 +39,7 @@ document.body.onresize = () => {
     loadSectionToCanvas();
     
 }
-
-document.body.onkeydown = (e) => {
+document.body.onkeydown = (e) => { // Keyboard shortcuts
     if (e.target.tagName == "INPUT") return;
     const key = e.key.toLowerCase();
     if (key == "b") setSelectedLayer("Base");
@@ -61,11 +54,13 @@ document.body.onkeydown = (e) => {
     loadSectionToCanvas();
 }
 
+// Option selector listener
 const multioptions = document.getElementsByClassName("multioption");
 for(let i = 0; i < multioptions.length; i++) {
     multioptions[i].onclick = () => {loadSectionToCanvas(); updatePreviewTexture(); updatePose();};
 }
 
+// Drawing runtime variables
 let startX = 0
 let startY = 0
 let endX = 0
@@ -73,14 +68,17 @@ let endY = 0
 let width = 0;
 let height = 0;
 
+var brushSize = 1;
+
+// Skin runtime variables
 var fullSkinCanvas;
 var fullSkinContext;
 var loadedSkin;
 
-var brushSize = 1;
-
+// Load the default skin
 loadURLAsCanvas("/default-skin.png");
 
+// Locations of different body parts on the skin PNG
 const skinDimensions = {
     "Head": {
         "Top": {
@@ -313,6 +311,7 @@ const skinDimensions = {
     }
 }
 
+// Where the pivot points of different body parts are (for posing the model)
 const partPivotPoints = {
     "Head": [0, -8, 0],
     "Body": [0, 0, 0],
@@ -322,11 +321,13 @@ const partPivotPoints = {
     "Right Leg": [0, 4, 0],
 }
 
+// Popup message
 function showMessage(message) {
     messageBoxContent.innerText = message;
     messageBox.classList.add("visible");
 }
 
+// Takes a URL (data or otherwise) and loads it as the current skin
 function loadURLAsCanvas(url) {
     loadedSkin = new Image();
     loadedSkin.crossOrigin = "anonymous";
@@ -348,6 +349,7 @@ function loadURLAsCanvas(url) {
     }
     loadedSkin.src = url;
 }
+// Callback for when a user loads a local skin file
 function loadFileEvent(fileElement) {
     const selectedFile = fileElement.files[0]; // Access the first selected file
         if (selectedFile) {
@@ -362,19 +364,22 @@ function loadFileEvent(fileElement) {
         }
 }
 
+// Convert the brush slider's value (which is a STRING for some reason) to a number
 function updateBrushDrawSize() {
     brushSize = Number(brushDrawSizeSlider.value);
 }
 
+// Converts RGB value to hex to coordinate the canvas's RGB with the color selector's hex
 function componentToHex(c) {
   var hex = c.toString(16);
   return hex.length == 1 ? "0" + hex : hex;
 }
-
+// Converts a whole RGB tuple to a hex string
 function rgbToHex(r, g, b) {
   return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
+// Reads the user selected options for what area of the skin file to load, loading it into the editor canvas
 function loadSectionToCanvas() {
     
     let layer = getSelectedLayer();
@@ -393,7 +398,6 @@ function loadSectionToCanvas() {
 
     context.canvas.width = width;
     context.canvas.height = height;
-
 
     const maxWidth = editorCanvasContainer.clientWidth;
     const maxHeight = editorCanvasContainer.clientHeight;
@@ -415,6 +419,7 @@ function loadSectionToCanvas() {
     
 }
 
+// Read/Write the radio buttons for the current layer
 function getSelectedLayer() {
     var input = document.querySelector('input[name="layer"]:checked')
     if (input) return input.value;
@@ -427,6 +432,8 @@ function setSelectedLayer(layer) {
         }
     }
 }
+
+// Read/Write the radio buttons for the current side
 function getSelectedSide() {
     var input = document.querySelector('input[name="side"]:checked');
     if (input) return input.value;
@@ -439,6 +446,8 @@ function setSelectedSide(side) {
         }
     }
 }
+
+// Read/Write the radio buttons for the current part
 function getSelectedPart() {
     var input = document.querySelector('input[name="part"]:checked');
     if (input) return input.value;
@@ -451,6 +460,8 @@ function setSelectedPart(part) {
         }
     }
 }
+
+// Read/Write the radio buttons for the current type of skin
 function getSelectedType() {
     var input = document.querySelector('input[name="type"]:checked');
     if (input) return input.value;
@@ -464,6 +475,7 @@ function setSelectedType(type) {
     }
 }
 
+// Read/Write the radio buttons for the current brush
 function getSelectedBrush() {
     var input = document.querySelector('input[name="brush"]:checked');
     if (input) return input.value;
@@ -477,21 +489,27 @@ function setSelectedBrush(brush) {
     }
 }
 
+// Read the radio buttons for the current pose
 function getSelectedPose() {
     var input = document.querySelector('input[name="pose"]:checked');
     if (input) return input.value;
 }
 
+// Creates a download link for the current skin based on the internal canvas and clicks it
 function saveSkin() {
     var link = document.createElement('a');
     link.download = 'skin.png';
     link.href = fullSkinCanvas.toDataURL()
     link.click();
 }
+
+// Get the hex color value of the skin at a given coordinate
 function getHexPixelAt(x, y) {
     const pixelData = fullSkinContext.getImageData(x, y, 1, 1).data;
     return rgbToHex(pixelData[0],pixelData[1], pixelData[2]);
 }
+
+// Applies the current brush at a coordinate, either erasing or filling depending on "fill"
 function applyBrushAt(x, y, fill=true) {
 
     const brush = getSelectedBrush();
@@ -557,28 +575,34 @@ function applyBrushAt(x, y, fill=true) {
     loadSectionToCanvas();
 }
 
+// Applies the brush at a given event (assumed to be on the editor canvas)
 function applyBrush(e) {
     let pixelX = Math.floor((e.offsetX/editorCanvas.clientWidth)*width);
     let pixelY = Math.floor((e.offsetY/editorCanvas.clientHeight)*height);
     applyBrushAt(pixelX, pixelY);
 }
 
-
+// Whether we are currently drawing (so we can draw on the mousemove event)
 var isCurrentlyDrawing = false;
+// Draw when the mouse is down
 editorCanvas.onmousedown = function(e) {
     isCurrentlyDrawing = true;
     applyBrush(e);
 }
+// Draw when we are dragging
 editorCanvas.onmousemove = function(e) {
     if (isCurrentlyDrawing) {
         applyBrush(e);
     }
 }
+// Stop drawing when we're not dragging (then update the preview)
 document.onmouseup = function(e) {
     isCurrentlyDrawing = false;
 
     updatePreviewTexture();
 }
+
+// Erase if we are right clicking
 editorCanvas.oncontextmenu = function(e) {
     e.preventDefault();
     let pixelX = Math.floor((e.offsetX/editorCanvas.clientWidth)*width);
@@ -586,6 +610,7 @@ editorCanvas.oncontextmenu = function(e) {
     applyBrushAt(pixelX, pixelY, false);
 }
 
+// Fit the preview to its container (raw CSS does not make the cut unfortunately)
 function updatePreviewSize() {
     let previewWidth = previewContainer.clientWidth;
     let previewHeight = previewContainer.clientHeight;
@@ -593,6 +618,8 @@ function updatePreviewSize() {
     previewCamera.aspect = (previewWidth/previewHeight);
     previewCamera.updateProjectionMatrix();
 }
+
+// Cut out a portion of the canvas and get it as a data URL to load it elsewhere
 function getSectionAsURL(layer, side, part, type) {
     if ([layer, side, part, type].includes(undefined)) return;
 
@@ -613,6 +640,8 @@ function getSectionAsURL(layer, side, part, type) {
     canvasContext.drawImage(fullSkinCanvas, startX, startY, width, height, 0, 0, width, height);
     return canvas.toDataURL();
 }
+
+// Get a given part as an array of textures that may be placed on a cube (for BoxGeometry)
 function getPartAsCubeTextureArray(layer, part) {
     const type = getSelectedType();
     const get = (side) => {return getSectionAsURL(layer, side, part, type)};
@@ -632,6 +661,7 @@ function getPartAsCubeTextureArray(layer, part) {
     return textures;
 
 }
+// Apply textures to every material in an array
 function applyTexArrayToMatArray(texArray, matArray) {
     matArray.forEach((value, index, array) => {
         value.map = texArray[index];
@@ -639,11 +669,13 @@ function applyTexArrayToMatArray(texArray, matArray) {
         value.map.magFilter = THREE.NearestFilter;
     });
 }
+// Set whether a group of outer layer planes is visible
 function setOuterMeshVisibility(mesh, visible) {
     mesh.forEach((value, index, array) => {
         value.visible = visible;
     });
 }
+// Update the skin shown on the 3D preview
 function updatePreviewTexture() {
     const type = getSelectedType();
     if (type == "Slim") {
