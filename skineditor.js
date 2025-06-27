@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+
+
 const editorCanvas = document.getElementById("editor-canvas");
 const editorCanvasContainer = document.getElementById("editor-canvas-container");
 const context = editorCanvas.getContext("2d");
@@ -16,12 +18,23 @@ const brushColorInput = document.getElementById("brush-color");
 const messageBox = document.getElementById("message-box");
 const messageBoxContent = document.getElementById("message-box-content");
 
+const brushSizeSlider = document.getElementById("brush-draw-size")
+
+var hasSeenTutorial = localStorage.getItem("hasSeenTutorial");
+if (hasSeenTutorial == null) {
+    hasSeenTutorial = false;
+    localStorage.setItem("hasSeenTutorial", "no");
+}
+if (localStorage.getItem("hasSeenTutorial") == "yes") {
+    messageBox.classList.remove("visible");
+}
+
 // Event Listeners
-document.getElementById("brush-draw-size").onchange = () => {updateBrushDrawSize()};
+brushSizeSlider.onchange = () => {updateBrushDrawSize()};
 document.getElementById("save-skin").onclick = () => {saveSkin()};
 document.getElementById("load-skin-from-account").onclick = () => {loadURLAsCanvas("https://mineskin.eu/skin/" + skinAccountNameInput.value)};
 document.getElementById("open-skin").onchange = (event) => {loadFileEvent(event.target)};
-document.getElementById("message-box-acknowledge").onclick = (event) => {messageBox.classList.remove("visible")};
+document.getElementById("message-box-acknowledge").onclick = (event) => {messageBox.classList.remove("visible"); localStorage.setItem("hasSeenTutorial", "yes")};
 
 
 document.body.onload = () => {
@@ -31,6 +44,21 @@ document.body.onresize = () => {
     updatePreviewSize();
     loadSectionToCanvas();
     
+}
+
+document.body.onkeydown = (e) => {
+    if (e.target.tagName == "INPUT") return;
+    const key = e.key.toLowerCase();
+    if (key == "b") setSelectedLayer("Base");
+    else if (key == "o") setSelectedLayer("Outer");
+    else if (key == "d") setSelectedBrush("Draw");
+    else if (key == "e") setSelectedBrush("Eyedropper");
+    else if (key == "f") setSelectedBrush("Bucket");
+    else if (key == "=" || key == "+") brushSizeSlider.value++;
+    else if (key == "-" || key == "_") brushSizeSlider.value--;
+    else if (key == "c") brushColorInput.click();
+
+    loadSectionToCanvas();
 }
 
 const multioptions = document.getElementsByClassName("multioption");
@@ -51,7 +79,7 @@ var loadedSkin;
 
 var brushSize = 1;
 
-loadURLAsCanvas("/default_skin5.png");
+loadURLAsCanvas("/default-skin.png");
 
 const skinDimensions = {
     "Head": {
@@ -303,7 +331,6 @@ function loadURLAsCanvas(url) {
     loadedSkin = new Image();
     loadedSkin.crossOrigin = "anonymous";
     loadedSkin.onload = () => {
-        console.log(loadedSkin.width, loadedSkin.height)
         if (loadedSkin.width != 64 || loadedSkin.height != 64) {
             showMessage("Skin file mush be 64x64!");
         } else {
@@ -385,13 +412,20 @@ function loadSectionToCanvas() {
     context.imageSmoothingEnabled = false;
 
     context.drawImage(fullSkinCanvas, startX, startY, width, height, 0, 0, editorCanvas.width, editorCanvas.height);
-
     
 }
 
 function getSelectedLayer() {
     var input = document.querySelector('input[name="layer"]:checked')
     if (input) return input.value;
+}
+function setSelectedLayer(layer) {
+    var inputs = document.getElementsByName('layer');
+    for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value == layer) {
+            inputs[i].checked = true;
+        }
+    }
 }
 function getSelectedSide() {
     var input = document.querySelector('input[name="side"]:checked');
@@ -402,7 +436,6 @@ function setSelectedSide(side) {
     for (let i = 0; i < inputs.length; i++) {
         if (inputs[i].value == side) {
             inputs[i].checked = true;
-            console.log(inputs[i]);
         }
     }
 }
@@ -415,7 +448,6 @@ function setSelectedPart(part) {
     for (let i = 0; i < inputs.length; i++) {
         if (inputs[i].value == part) {
             inputs[i].checked = true;
-            console.log(inputs[i]);
         }
     }
 }
@@ -423,10 +455,26 @@ function getSelectedType() {
     var input = document.querySelector('input[name="type"]:checked');
     if (input) return input.value;
 }
+function setSelectedType(type) {
+    var inputs = document.getElementsByName('type');
+    for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value == type) {
+            inputs[i].checked = true;
+        }
+    }
+}
 
 function getSelectedBrush() {
     var input = document.querySelector('input[name="brush"]:checked');
     if (input) return input.value;
+}
+function setSelectedBrush(brush) {
+    var inputs = document.getElementsByName('brush');
+    for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value == brush) {
+            inputs[i].checked = true;
+        }
+    }
 }
 
 function getSelectedPose() {
@@ -449,8 +497,6 @@ function applyBrushAt(x, y, fill=true) {
     const brush = getSelectedBrush();
 
     context.fillStyle = brushColorInput.value;
-    const editorBoundX = Math.floor(x/width*editorCanvas.width);
-    const editorBoundY = Math.floor(y/height*editorCanvas.height);
 
     x += startX;
     y += startY;
@@ -466,7 +512,6 @@ function applyBrushAt(x, y, fill=true) {
         var drawPosY = Math.max(y, startY)
         var drawWidth = Math.min(brushSize, endX-drawPosX);
         var drawHeight = Math.min(brushSize, endY-drawPosY);
-
         if (fill) {
             fullSkinContext.fillRect(drawPosX, drawPosY, drawWidth, drawHeight);
         } else {
@@ -478,14 +523,11 @@ function applyBrushAt(x, y, fill=true) {
         brushColorInput.value = getHexPixelAt(x, y);
     } else if (brush == "Bucket") {
         const colorToFill = getHexPixelAt(x, y);
-        console.log(colorToFill, brushColorInput.value, fullSkinContext.fillStyle);
         if (colorToFill == brushColorInput.value) return;
 
         var checked = []
 
         const fillAt = (x, y) => {
-            console.log(x-startX, y-startY, width, height);
-            //console.log(checked)
             const editorSpaceX = x-startX;
             const editorSpaceY = y-startY;
             if (editorSpaceX < 0) return;
@@ -501,7 +543,6 @@ function applyBrushAt(x, y, fill=true) {
         }
 
         const fillPixel = (x_coord, y_coord) => {
-            console.log(x_coord, y_coord)
             fullSkinContext.fillRect(x_coord, y_coord, 1, 1);
             
 
@@ -521,6 +562,7 @@ function applyBrush(e) {
     let pixelY = Math.floor((e.offsetY/editorCanvas.clientHeight)*height);
     applyBrushAt(pixelX, pixelY);
 }
+
 
 var isCurrentlyDrawing = false;
 editorCanvas.onmousedown = function(e) {
@@ -786,16 +828,11 @@ function addAllToGroup(meshes, group, position) {
     })
 }
 function moveBy(mesh, position, mult=1) {
-    var meshPosition = /*mesh.localToWorld(*/mesh.position//);
-    console.log(mesh.position, meshPosition)
+    var meshPosition = mesh.position;
     meshPosition.add(new THREE.Vector3(position[0] * mult, position[1] * mult, position[2] * mult));
-    console.log(meshPosition);
-    //meshPosition = mesh.worldToLocal(meshPosition);
-    console.log(meshPosition)
     mesh.position.x = meshPosition.x
     mesh.position.y = meshPosition.y
     mesh.position.z = meshPosition.z;
-    console.log(mesh.position)
 }
 
 const raycaster = new THREE.Raycaster();
@@ -897,7 +934,6 @@ renderer.domElement.onmouseup = (event) => {
     const firstIntersected = intersects[0];
     if (firstIntersected != undefined) {
 	    const [part, side] = firstIntersected.object.name.split(" ");
-        console.log(side, part);
         setSelectedSide(side);
         setSelectedPart(part.replaceAll("_", " "));
         loadSectionToCanvas();

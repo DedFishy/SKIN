@@ -6,9 +6,19 @@
         <link rel="stylesheet" href="/style.css">
     </head>
     <body>
-        <div id="message-box">
+        <div id="message-box" class="visible">
             <div id="message-box-content">
-                CHICKEN JOCKEY!
+                <h1>SKIN</h1>
+                Welcome to SKIN, a Minecraft Java Edition skin editor by Boyne Gregg! This project is not affiliated with or endorsed by Minecraft, Mojang, or Microsoft in any way.<br>
+                <h3>About Skins</h3>
+                Skins are made of two layers, the base layer and the outer layer. This editor can touch both.<br>
+                Make sure to select whether your skin is Classic or Slim (slim skins have thinner arms). if you don't, your design could get messed up!<br>
+                <h3>About Shortcuts</h3>
+                Any keyboard keys that are shown in [BRACKETS] are keyboard shortcuts. Simply press the corresponding key on your keyboard to activate the element!<br>
+                <h3>About The Preview</h3>
+                The skin preview in the bottom right corner is interactive. By grabbing it with your mouse and dragging it, you can rotate it. By scrolling in it, you can zoom. By right-click dragging it, you can pan. Clicking any surface will automatically select that surface to be edited in the canvas.<br>
+                <h3>About The Canvas</h3>
+                You may draw on the canvas by clicking and by clicking-and-dragging.
             </div>
             <button id="message-box-acknowledge">Okay</button>
         </div>
@@ -34,11 +44,11 @@
                     <div class="multioption-pill">
                         
                         <input type="radio" name="layer" id="layer-base" value="Base" checked>
-                        <label for="layer-base">Base</label>
+                        <label for="layer-base">[B]ase</label>
                     </div>
                     <div class="multioption-pill">
                         <input type="radio" name="layer" id="layer-outer" value="Outer">
-                        <label for="layer-outer">Outer</label>
+                        <label for="layer-outer">[O]uter</label>
                     </div>
                 </form>
                 <form class="multioption">
@@ -124,33 +134,35 @@
                     </p>
                     <div class="multioption-pill">
                         <input type="radio" name="brush" id="brush-draw" value="Draw" checked>
-                        <label for="brush-draw">Draw</label>
+                        <label for="brush-draw">[D]raw</label>
                         
                     </div>
                     <div class="multioption-pill">
                         <input type="radio" name="brush" id="brush-eyedropper" value="Eyedropper">
-                        <label for="brush-eyedropper">Eyedropper</label>
+                        <label for="brush-eyedropper">[E]yedropper</label>
                     </div>
                     <div class="multioption-pill">
                         <input type="radio" name="brush" id="brush-bucket" value="Bucket">
-                        <label for="brush-bucket">Bucket</label>
+                        <label for="brush-bucket">Bucket [F]ill</label>
                     </div>
                 </form>
+                
+                <div class="options-row">
+                    <div class="multioption-hidden brush-option">
+                        <label for="brush-draw-size">
+                            <ion-icon name="expand-outline"></ion-icon>
+                            Size [+/-]:
+                        </label>
+                        <input type="range" min="1" max="12" name="brush" id="brush-draw-size" value="1" autocomplete="off">
+                    </div>
 
-                <div class="multioption-hidden brush-option">
-                    <label for="brush-draw-size">
-                        <ion-icon name="expand-outline"></ion-icon>
-                        Size:
-                    </label>
-                    <input type="range" min="1" max="12" name="brush" id="brush-draw-size" value="1" autocomplete="off">
-                </div>
-
-                <div class="brush-option">
-                    <label for="brush-color">
-                        <ion-icon name="color-palette-outline"></ion-icon>
-                        Color:
-                    </label>
-                    <input type="color" name="brush-color" id="brush-color" value="#000000">
+                    <div class="brush-option">
+                        <label for="brush-color">
+                            <ion-icon name="color-palette-outline"></ion-icon>
+                            [C]olor:
+                        </label>
+                        <input type="color" name="brush-color" id="brush-color" value="#000000">
+                    </div>
                 </div>
                 
 

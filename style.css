@@ -109,8 +109,8 @@ h1, h2, h3 {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.1);
-    width: 25vw;
-    height: 25vh;
+    width: fit-content;
+    height: fit-content;
     margin: auto;
     display: flex;
     flex-direction: column;
@@ -129,6 +129,8 @@ h1, h2, h3 {
 #message-box-content {
     flex-grow: 1;
     align-content: center;
+    text-align: center;
+    padding: 25px;
 }
 #message-box-acknowledge {
     margin: 0;
@@ -183,7 +185,7 @@ h1, h2, h3 {
 }
 
 /* ALL of the multiselector appearing options (I see why people like CSS libraries...) */
-.multioption:has(.multioption-pill #brush-draw[type="radio"]:checked) ~ .brush-option {
+.multioption:has(.multioption-pill #brush-draw[type="radio"]:checked) ~ .options-row .brush-option {
     display: flex;
     flex-direction: row;
     align-items: center;
