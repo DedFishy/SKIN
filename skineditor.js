@@ -422,18 +422,19 @@ function applyBrushAt(x, y, fill=true) {
     x += startX;
     y += startY;
 
-    const maxFillWidth = (width - (editorBoundX/editorCanvas.width));
-    const maxFillHeight = (height - (editorBoundY/editorCanvas.height));
+    fullSkinContext.fillStyle = brushColorInput.value;
 
     if (brush == "Draw") {
 
+        var drawPosX = Math.max(x, startX);
+        var drawPosY = Math.max(y, startY)
+        var drawWidth = Math.min(brushSize, endX-drawPosX);
+        var drawHeight = Math.min(brushSize, endY-drawPosY);
 
-        
-        fullSkinContext.fillStyle = brushColorInput.value;
         if (fill) {
-            fullSkinContext.fillRect(x, y, Math.min(brushSize, maxFillWidth), Math.min(brushSize, maxFillHeight));
+            fullSkinContext.fillRect(drawPosX, drawPosY, drawWidth, drawHeight);
         } else {
-            fullSkinContext.clearRect(x, y, Math.min(brushSize, maxFillWidth), Math.min(brushSize, maxFillHeight));
+            fullSkinContext.clearRect(drawPosX, drawPosY, drawWidth, drawHeight);
         }
 
 
@@ -452,15 +453,13 @@ function applyBrushAt(x, y, fill=true) {
             const editorSpaceY = y-startY;
             if (editorSpaceX < 0) return;
             if (editorSpaceY < 0) return;
-            if (editorSpaceX > width) return;
-            if (editorSpaceY > height) return;
+            if (editorSpaceX >= width) return;
+            if (editorSpaceY >= height) return;
             if (checked.includes([x, y])) return;
 
             checked.push([x, y]);
             if (getHexPixelAt(x, y) == colorToFill) {
                 fillPixel(x, y);
-            } else {
-                //console.log("Didn't fill", x, ":", y, "because it is", getHexPixelAt(x, y), "while the target color is", colorToFill);
             }
         }
 
