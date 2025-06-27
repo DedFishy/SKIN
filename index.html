@@ -6,6 +6,13 @@
         <link rel="stylesheet" href="/style.css">
     </head>
     <body>
+        <div id="message-box">
+            <div id="message-box-content">
+                CHICKEN JOCKEY!
+            </div>
+            <button id="message-box-acknowledge">Okay</button>
+        </div>
+
         <div id="left">
             
             <div id="editor-canvas-container">
@@ -20,8 +27,12 @@
             <h3>By Boyne Gregg</h3>
             <div id="canvas-options">
                 <form class="multioption">
-                    <p>Layer:</p>
+                    <p>
+                        <ion-icon name="layers-outline"></ion-icon>
+                        Layer:
+                    </p>
                     <div class="multioption-pill">
+                        
                         <input type="radio" name="layer" id="layer-base" value="Base" checked>
                         <label for="layer-base">Base</label>
                     </div>
@@ -31,7 +42,10 @@
                     </div>
                 </form>
                 <form class="multioption">
-                    <p>Side:</p>
+                    <p>
+                        <ion-icon name="cube-outline"></ion-icon>
+                        Side:
+                    </p>
                     <div class="multioption-pill">
                         <input type="radio" name="side" id="side-front" value="Front" checked>
                         <label for="side-front">Front</label>
@@ -58,7 +72,10 @@
                     </div>
                 </form>
                 <form class="multioption">
-                    <p>Part:</p>
+                    <p>
+                        <ion-icon name="hammer-outline"></ion-icon>
+                        Part:
+                    </p>
                     <div class="multioption-pill">
                         <input type="radio" name="part" id="part-head" value="Head" checked>
                         <label for="part-head">Head</label>
@@ -86,7 +103,10 @@
                 </form>
 
                 <form class="multioption" id="form-type">
-                    <p>Type:</p>
+                    <p>
+                        <ion-icon name="resize-outline"></ion-icon>
+                        Type:
+                    </p>
                     <div class="multioption-pill">
                         <input type="radio" name="type" id="type-classic" value="Classic" checked>
                         <label for="type-classic">Classic</label>
@@ -98,7 +118,10 @@
                 </form>
 
                 <form class="multioption">
-                    <p>Brush:</p>
+                    <p>
+                        <ion-icon name="brush-outline"></ion-icon>
+                        Brush:
+                    </p>
                     <div class="multioption-pill">
                         <input type="radio" name="brush" id="brush-draw" value="Draw" checked>
                         <label for="brush-draw">Draw</label>
@@ -115,12 +138,18 @@
                 </form>
 
                 <div class="multioption-hidden brush-option">
-                    <label for="brush-draw-size">Size:</label>
+                    <label for="brush-draw-size">
+                        <ion-icon name="expand-outline"></ion-icon>
+                        Size:
+                    </label>
                     <input type="range" min="1" max="12" name="brush" id="brush-draw-size" value="1" autocomplete="off">
                 </div>
 
                 <div class="brush-option">
-                    <label for="brush-color">Color:</label>
+                    <label for="brush-color">
+                        <ion-icon name="color-palette-outline"></ion-icon>
+                        Color:
+                    </label>
                     <input type="color" name="brush-color" id="brush-color" value="#000000">
                 </div>
                 
@@ -130,10 +159,18 @@
             </div>
             <div id="options-menu">
                 <div class="options-row">
-                    <input type="file" id="open-skin" name="open-skin" accept="image/png" value="Open File">
-                    <button id="save-skin">Save File</button>
+                    <div class="option">
+                        <ion-icon name="folder-open-outline"></ion-icon>
+                        <input type="file" id="open-skin" name="open-skin" accept="image/png" value="Open File">
+                    </div>
+                    <div class="option">
+                        <ion-icon name="save-outline"></ion-icon>
+                        <button id="save-skin">Save File</button>
+                    </div>
+                        
                 </div>
                 <div class="options-row">
+                    <ion-icon name="cloud-download-outline"></ion-icon>
                     <input type="text" placeholder="Name" id="skin-account-name">
                     <button id="load-skin-from-account">Load From Account</button>
                 </div>
@@ -164,6 +201,9 @@
             </script>
             
             <script type="module" src="/skineditor.js"></script>
+
+            <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+            <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
             <!-- CHICKEN JOCKEY! -->
         </div>

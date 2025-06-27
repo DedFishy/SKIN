@@ -13,11 +13,15 @@ const skinAccountNameInput = document.getElementById("skin-account-name");
 
 const brushColorInput = document.getElementById("brush-color");
 
+const messageBox = document.getElementById("message-box");
+const messageBoxContent = document.getElementById("message-box-content");
+
 // Event Listeners
 document.getElementById("brush-draw-size").onchange = () => {updateBrushDrawSize()};
 document.getElementById("save-skin").onclick = () => {saveSkin()};
 document.getElementById("load-skin-from-account").onclick = () => {loadURLAsCanvas("https://mineskin.eu/skin/" + skinAccountNameInput.value)};
 document.getElementById("open-skin").onchange = (event) => {loadFileEvent(event.target)};
+document.getElementById("message-box-acknowledge").onclick = (event) => {messageBox.classList.remove("visible")};
 
 
 document.body.onload = () => {
@@ -290,20 +294,32 @@ const partPivotPoints = {
     "Right Leg": [0, 4, 0],
 }
 
+function showMessage(message) {
+    messageBoxContent.innerText = message;
+    messageBox.classList.add("visible");
+}
+
 function loadURLAsCanvas(url) {
     loadedSkin = new Image();
     loadedSkin.crossOrigin = "anonymous";
     loadedSkin.onload = () => {
-        fullSkinCanvas.width = loadedSkin.width;
-        fullSkinCanvas.height = loadedSkin.height;
-        fullSkinContext.drawImage(loadedSkin, 0, 0);
-        loadSectionToCanvas();
-        updatePreviewTexture();     
+        console.log(loadedSkin.width, loadedSkin.height)
+        if (loadedSkin.width != 64 || loadedSkin.height != 64) {
+            showMessage("Skin file mush be 64x64!");
+        } else {
+
+            fullSkinCanvas = document.createElement("canvas");
+            
+            fullSkinContext = fullSkinCanvas.getContext("2d");
+            fullSkinCanvas.width = loadedSkin.width;
+            fullSkinCanvas.height = loadedSkin.height;
+            fullSkinContext.drawImage(loadedSkin, 0, 0);
+            loadSectionToCanvas();
+            updatePreviewTexture();   
+
+        }  
     }
     loadedSkin.src = url;
-    fullSkinCanvas = document.createElement("canvas");
-    
-    fullSkinContext = fullSkinCanvas.getContext("2d");
 }
 function loadFileEvent(fileElement) {
     const selectedFile = fileElement.files[0]; // Access the first selected file
@@ -381,11 +397,28 @@ function getSelectedSide() {
     var input = document.querySelector('input[name="side"]:checked');
     if (input) return input.value;
 }
+function setSelectedSide(side) {
+    var inputs = document.getElementsByName('side');
+    for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value == side) {
+            inputs[i].checked = true;
+            console.log(inputs[i]);
+        }
+    }
+}
 function getSelectedPart() {
     var input = document.querySelector('input[name="part"]:checked');
     if (input) return input.value;
 }
-
+function setSelectedPart(part) {
+    var inputs = document.getElementsByName('part');
+    for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value == part) {
+            inputs[i].checked = true;
+            console.log(inputs[i]);
+        }
+    }
+}
 function getSelectedType() {
     var input = document.querySelector('input[name="type"]:checked');
     if (input) return input.value;
@@ -658,7 +691,15 @@ const getPlaneRotation = (index) => {
     }
     return [0, 0, 0]
 }
-function consructPartOuterGeometry(width, height, depth, x, y, z) {
+const planeIndexToSide = {
+    0: "Right",
+    1: "Left",
+    2: "Top",
+    3: "Bottom",
+    4: "Front",
+    5: "Back"
+}
+function consructPartOuterGeometry(width, height, depth, x, y, z, partName) {
 
     const geometries = [
         new THREE.PlaneGeometry(depth, height), // Left  
@@ -680,6 +721,7 @@ function consructPartOuterGeometry(width, height, depth, x, y, z) {
     const meshes = [];
     for (let i = 0; i < geometries.length; i++) {
         meshes.push(new THREE.Mesh(geometries[i], materials[i]))
+        meshes[i].name = partName + " " + planeIndexToSide[i];
         const translation = getPlaneTranslation(i, width, height, depth);
         const rotation = getPlaneRotation(i);
         meshes[i].translateX(x + translation[0]);
@@ -756,6 +798,9 @@ function moveBy(mesh, position, mult=1) {
     console.log(mesh.position)
 }
 
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
 const loader = new THREE.TextureLoader();
 
 const preview = new THREE.Scene();
@@ -775,24 +820,24 @@ const outerIncrease = 0.25;
 
 const defaultTexture = new THREE.Texture();
 //     Mesh Name         Material Name                                 Width Height Length X   Y    Z
-const [headMesh,         headMaterials] =         consructPartGeometry(8,    8,     8,     0,  10,  0);
-const [bodyMesh,         bodyMaterials] =         consructPartGeometry(8,    12,    4,     0,  0,   0);
-const [leftArmMesh,      leftArmMaterials] =      consructPartGeometry(4,    12,    4,     -6, 0,   0);
-const [rightArmMesh,     rightArmMaterials] =     consructPartGeometry(4,    12,    4,     6,  0,   0);
-const [leftArmSlimMesh,  leftArmSlimMaterials] =  consructPartGeometry(3,    12,    4,     -5.5, 0,   0);
-const [rightArmSlimMesh, rightArmSlimMaterials] = consructPartGeometry(3,    12,    4,     5.5,  0,   0);
-const [leftLegMesh,      leftLegMaterials] =      consructPartGeometry(4,    12,    4,     -2, -12, 0);
-const [rightLegMesh,     rightLegMaterials] =     consructPartGeometry(4,    12,    4,     2,  -12, 0);
+const [headMesh,         headMaterials] =         consructPartGeometry(8,    8,     8,     0,  10,  0, "Head");
+const [bodyMesh,         bodyMaterials] =         consructPartGeometry(8,    12,    4,     0,  0,   0, "Body");
+const [leftArmMesh,      leftArmMaterials] =      consructPartGeometry(4,    12,    4,     -6, 0,   0, "Left_Arm");
+const [rightArmMesh,     rightArmMaterials] =     consructPartGeometry(4,    12,    4,     6,  0,   0, "Right_Arm");
+const [leftArmSlimMesh,  leftArmSlimMaterials] =  consructPartGeometry(3,    12,    4,     -5.5, 0,   0, "Left_Arm");
+const [rightArmSlimMesh, rightArmSlimMaterials] = consructPartGeometry(3,    12,    4,     5.5,  0,   0, "Right_Arm");
+const [leftLegMesh,      leftLegMaterials] =      consructPartGeometry(4,    12,    4,     -2, -12, 0, "Left_Leg");
+const [rightLegMesh,     rightLegMaterials] =     consructPartGeometry(4,    12,    4,     2,  -12, 0, "Right_Leg");
 
 //     Mesh Name              Material Name                                           Width Height Length X   Y    Z
-const [headOuterMesh,         headOuterMaterials] =         consructPartOuterGeometry(8,    8,     8,     0,  10,  0);
-const [bodyOuterMesh,         bodyOuterMaterials] =         consructPartOuterGeometry(8,    12,    4,     0,  0,   0);
-const [leftArmOuterMesh,      leftArmOuterMaterials] =      consructPartOuterGeometry(4,    12,    4,     -6, 0,   0);
-const [rightArmOuterMesh,     rightArmOuterMaterials] =     consructPartOuterGeometry(4,    12,    4,     6,  0,   0);
-const [leftArmOuterSlimMesh,  leftArmOuterSlimMaterials] =  consructPartOuterGeometry(3,    12,    4,     -5.5, 0,   0);
-const [rightArmOuterSlimMesh, rightArmOuterSlimMaterials] = consructPartOuterGeometry(3,    12,    4,     5.5,  0,   0);
-const [leftLegOuterMesh,      leftLegOuterMaterials] =      consructPartOuterGeometry(4,    12,    4,     -2, -12, 0);
-const [rightLegOuterMesh,     rightLegOuterMaterials] =     consructPartOuterGeometry(4,    12,    4,     2,  -12, 0);
+const [headOuterMesh,         headOuterMaterials] =         consructPartOuterGeometry(8,    8,     8,     0,  10,  0, "Head");
+const [bodyOuterMesh,         bodyOuterMaterials] =         consructPartOuterGeometry(8,    12,    4,     0,  0,   0, "Body");
+const [leftArmOuterMesh,      leftArmOuterMaterials] =      consructPartOuterGeometry(4,    12,    4,     -6, 0,   0, "Left_Arm");
+const [rightArmOuterMesh,     rightArmOuterMaterials] =     consructPartOuterGeometry(4,    12,    4,     6,  0,   0, "Right_Arm");
+const [leftArmOuterSlimMesh,  leftArmOuterSlimMaterials] =  consructPartOuterGeometry(3,    12,    4,     -5.5, 0,   0, "Left_Arm");
+const [rightArmOuterSlimMesh, rightArmOuterSlimMaterials] = consructPartOuterGeometry(3,    12,    4,     5.5,  0,   0, "Right_Arm");
+const [leftLegOuterMesh,      leftLegOuterMaterials] =      consructPartOuterGeometry(4,    12,    4,     -2, -12, 0, "Left_Leg");
+const [rightLegOuterMesh,     rightLegOuterMaterials] =     consructPartOuterGeometry(4,    12,    4,     2,  -12, 0, "Right_Leg");
 
 const headGroup = new THREE.Group();
 headGroup.add(headMesh);
@@ -844,7 +889,23 @@ controls.update();
 
 updatePreviewSize();
 
+renderer.domElement.onmouseup = (event) => {
+    pointer.x = ( event.offsetX / renderer.domElement.offsetWidth ) * 2 - 1;
+	pointer.y = -(( event.offsetY / renderer.domElement.offsetHeight ) * 2)  + 1;
+    raycaster.setFromCamera( pointer, previewCamera );
+    const intersects = raycaster.intersectObjects( preview.children );
+    const firstIntersected = intersects[0];
+    if (firstIntersected != undefined) {
+	    const [part, side] = firstIntersected.object.name.split(" ");
+        console.log(side, part);
+        setSelectedSide(side);
+        setSelectedPart(part.replaceAll("_", " "));
+        loadSectionToCanvas();
+    }
+}
+
 function renderPreview() {
+    
     controls.update();
     renderer.render( preview, previewCamera );
     updatePreviewSize();
