@@ -47,7 +47,7 @@ var loadedSkin;
 
 var brushSize = 1;
 
-loadURLAsCanvas("/default_skin3.png");
+loadURLAsCanvas("/default_skin5.png");
 
 const skinDimensions = {
     "Head": {
@@ -135,8 +135,8 @@ const skinDimensions = {
         },
         "Right": {
             "Classic": {
-                "Base": [52,20,55,31],
-                "Outer": [52,36,55,47]
+                "Base": [48,20,51,31],
+                "Outer": [48,36,51,47]
             },
             "Slim": {
                 "Base": [50,20,53,31],
@@ -155,8 +155,9 @@ const skinDimensions = {
         },
         "Back": {
             "Classic": {
-                "Base": [48,20,51,31],
-                "Outer": [48,36,51,47]
+                "Base": [52,20,55,31],
+                "Outer": [52,36,55,47]
+                
             },
             "Slim": {
                 "Base": [47,20,49,31],
@@ -198,7 +199,7 @@ const skinDimensions = {
         "Right": {
             "Classic": {
                 "Base": [40,52,43,63],
-                "Outer": [60,52,63,63]
+                "Outer": [56,52,59,63]
             },
             "Slim": {
                 "Base": [40,52,43,63],
@@ -240,16 +241,16 @@ const skinDimensions = {
             "Outer": [0,36,3,47]
         },
         "Right": {
-            "Base": [12,20,15,31],
-            "Outer": [12,36,15,47]
+            "Base": [8,20,11,31],
+            "Outer": [8,36,11,47]
         },
         "Front": {
             "Base": [4,20,7,31],
             "Outer": [4,36,7,47]
         },
         "Back": {
-            "Base": [8,20,11,31],
-            "Outer": [8,36,11,47]
+            "Base": [12,20,15,31],
+            "Outer": [12,36,15,47]
         }
     },
     "Right Leg": {
@@ -266,8 +267,8 @@ const skinDimensions = {
             "Outer": [0,52,3,63]
         },
         "Right": {
-            "Base": [28,52,31,63],
-            "Outer": [12,52,15,63]
+            "Base": [24,52,27,63],
+            "Outer": [8,52,11,63]
         },
         "Front": {
             "Base": [20,52,23,63],
@@ -281,12 +282,12 @@ const skinDimensions = {
 }
 
 const partPivotPoints = {
-    "Head": [0, 0, 0],
+    "Head": [0, -8, 0],
     "Body": [0, 0, 0],
-    "Left Arm": [0, 0, 0],
-    "Right Arm": [0, 0, 0],
-    "Left Leg": [0, 0, 0],
-    "Right Leg": [0, 0, 0],
+    "Left Arm": [0, -4, 0],
+    "Right Arm": [0, -4, 0],
+    "Left Leg": [0, 4, 0],
+    "Right Leg": [0, 4, 0],
 }
 
 function loadURLAsCanvas(url) {
@@ -690,7 +691,6 @@ function setBodyPose(
     leftLegRot,
     rightLegRot
 ) {
-    console.log(headGroup.rotation);
     setGroupRot(headGroup, headRot);
     setGroupRot(bodyGroup, bodyRot);
     setGroupRot(leftArmGroup, leftArmRot);
@@ -712,12 +712,12 @@ function updatePose() {
         );
     } else if (pose == "Running") {
         setBodyPose(
+            [0,0,0],
+            [0,0,0],
             [1,0,0],
-            [0,0,0],
-            [0,0,0],
-            [0,0,0],
-            [0,0,0],
-            [0,0,0]
+            [-1,0,0],
+            [-1,0,0],
+            [1,0,0]
         );
     }
 }
@@ -728,9 +728,16 @@ function addAllToGroup(meshes, group, position) {
     })
 }
 function moveBy(mesh, position, mult=1) {
-    mesh.translateX(position[0] * mult);
-    mesh.translateY(position[1] * mult);
-    mesh.translateZ(position[2] * mult);
+    var meshPosition = /*mesh.localToWorld(*/mesh.position//);
+    console.log(mesh.position, meshPosition)
+    meshPosition.add(new THREE.Vector3(position[0] * mult, position[1] * mult, position[2] * mult));
+    console.log(meshPosition);
+    //meshPosition = mesh.worldToLocal(meshPosition);
+    console.log(meshPosition)
+    mesh.position.x = meshPosition.x
+    mesh.position.y = meshPosition.y
+    mesh.position.z = meshPosition.z;
+    console.log(mesh.position)
 }
 
 const loader = new THREE.TextureLoader();
@@ -785,14 +792,20 @@ moveBy(bodyGroup, partPivotPoints["Body"], -1);
 
 const leftArmGroup = new THREE.Group();
 leftArmGroup.add(leftArmMesh);
+leftArmGroup.add(leftArmSlimMesh);
 moveBy(leftArmMesh, partPivotPoints["Left Arm"], 1);
+moveBy(leftArmSlimMesh, partPivotPoints["Left Arm"], 1);
 addAllToGroup(leftArmOuterMesh, leftArmGroup, partPivotPoints["Left Arm"]);
+addAllToGroup(leftArmOuterSlimMesh, leftArmGroup, partPivotPoints["Left Arm"]);
 moveBy(leftArmGroup, partPivotPoints["Left Arm"], -1);
 
 const rightArmGroup = new THREE.Group();
 rightArmGroup.add(rightArmMesh);
+rightArmGroup.add(rightArmSlimMesh);
 moveBy(rightArmMesh, partPivotPoints["Right Arm"], 1);
+moveBy(rightArmSlimMesh, partPivotPoints["Right Arm"], 1);
 addAllToGroup(rightArmOuterMesh, rightArmGroup, partPivotPoints["Right Arm"]);
+addAllToGroup(rightArmOuterSlimMesh, rightArmGroup, partPivotPoints["Right Arm"]);
 moveBy(rightArmGroup, partPivotPoints["Right Arm"], -1);
 
 const leftLegGroup = new THREE.Group();
