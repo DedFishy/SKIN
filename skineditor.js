@@ -426,6 +426,9 @@ function applyBrushAt(x, y, fill=true) {
 
     if (brush == "Draw") {
 
+        // Center brush
+        x -= Math.floor(brushSize/2);
+        y -= Math.floor(brushSize/2);
         var drawPosX = Math.max(x, startX);
         var drawPosY = Math.max(y, startY)
         var drawWidth = Math.min(brushSize, endX-drawPosX);
