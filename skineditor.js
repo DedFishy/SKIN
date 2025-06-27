@@ -31,7 +31,7 @@ document.body.onresize = () => {
 
 const multioptions = document.getElementsByClassName("multioption");
 for(let i = 0; i < multioptions.length; i++) {
-    multioptions[i].onclick = () => {loadSectionToCanvas(); updatePreviewTexture();};
+    multioptions[i].onclick = () => {loadSectionToCanvas(); updatePreviewTexture(); updatePose();};
 }
 
 let startX = 0
@@ -280,6 +280,15 @@ const skinDimensions = {
     }
 }
 
+const partPivotPoints = {
+    "Head": [0, 0, 0],
+    "Body": [0, 0, 0],
+    "Left Arm": [0, 0, 0],
+    "Right Arm": [0, 0, 0],
+    "Left Leg": [0, 0, 0],
+    "Right Leg": [0, 0, 0],
+}
+
 function loadURLAsCanvas(url) {
     loadedSkin = new Image();
     loadedSkin.crossOrigin = "anonymous";
@@ -386,6 +395,11 @@ function getSelectedBrush() {
     if (input) return input.value;
 }
 
+function getSelectedPose() {
+    var input = document.querySelector('input[name="pose"]:checked');
+    if (input) return input.value;
+}
+
 function saveSkin() {
     var link = document.createElement('a');
     link.download = 'skin.png';
@@ -440,7 +454,7 @@ function applyBrushAt(x, y, fill=true) {
             if (editorSpaceX > width) return;
             if (editorSpaceY > height) return;
             if (checked.includes([x, y])) return;
-            
+
             checked.push([x, y]);
             if (getHexPixelAt(x, y) == colorToFill) {
                 fillPixel(x, y);
@@ -603,7 +617,6 @@ function consructPartGeometry(width, height, depth, x, y, z) {
     mesh.translateX(x);
     mesh.translateY(y);
     mesh.translateZ(z);
-    preview.add(mesh);
     return [mesh, materials];
 }
 const getPlaneTranslation = (index, w, h, d) => {
@@ -660,10 +673,64 @@ function consructPartOuterGeometry(width, height, depth, x, y, z) {
         meshes[i].rotateZ(rotation[2]);
     }
     
-    meshes.forEach((value, index, array) => {
-        preview.add(value);
-    });
     return [meshes, materials];
+}
+
+function setGroupRot(group, rot) {
+    group.rotation.x = rot[0];
+    group.rotation.y = rot[1];
+    group.rotation.z = rot[2];
+}
+
+function setBodyPose(
+    headRot,
+    bodyRot,
+    leftArmRot,
+    rightArmRot,
+    leftLegRot,
+    rightLegRot
+) {
+    console.log(headGroup.rotation);
+    setGroupRot(headGroup, headRot);
+    setGroupRot(bodyGroup, bodyRot);
+    setGroupRot(leftArmGroup, leftArmRot);
+    setGroupRot(rightArmGroup, rightArmRot);
+    setGroupRot(leftLegGroup, leftLegRot);
+    setGroupRot(rightLegGroup, rightLegRot)
+}
+
+function updatePose() {
+    const pose = getSelectedPose();
+    if (pose == "Normal") {
+        setBodyPose(
+            [0,0,0],
+            [0,0,0],
+            [0,0,0],
+            [0,0,0],
+            [0,0,0],
+            [0,0,0]
+        );
+    } else if (pose == "Running") {
+        setBodyPose(
+            [1,0,0],
+            [0,0,0],
+            [0,0,0],
+            [0,0,0],
+            [0,0,0],
+            [0,0,0]
+        );
+    }
+}
+function addAllToGroup(meshes, group, position) {
+    meshes.forEach((value, index, array) => {
+        group.add(value);
+        moveBy(value, position, 1);
+    })
+}
+function moveBy(mesh, position, mult=1) {
+    mesh.translateX(position[0] * mult);
+    mesh.translateY(position[1] * mult);
+    mesh.translateZ(position[2] * mult);
 }
 
 const loader = new THREE.TextureLoader();
@@ -703,6 +770,44 @@ const [leftArmOuterSlimMesh,  leftArmOuterSlimMaterials] =  consructPartOuterGeo
 const [rightArmOuterSlimMesh, rightArmOuterSlimMaterials] = consructPartOuterGeometry(3,    12,    4,     5.5,  0,   0);
 const [leftLegOuterMesh,      leftLegOuterMaterials] =      consructPartOuterGeometry(4,    12,    4,     -2, -12, 0);
 const [rightLegOuterMesh,     rightLegOuterMaterials] =     consructPartOuterGeometry(4,    12,    4,     2,  -12, 0);
+
+const headGroup = new THREE.Group();
+headGroup.add(headMesh);
+moveBy(headMesh, partPivotPoints["Head"], 1);
+addAllToGroup(headOuterMesh, headGroup, partPivotPoints["Head"]);
+moveBy(headGroup, partPivotPoints["Head"], -1);
+
+const bodyGroup = new THREE.Group();
+bodyGroup.add(bodyMesh);
+moveBy(bodyMesh, partPivotPoints["Body"], 1);
+addAllToGroup(bodyOuterMesh, bodyGroup, partPivotPoints["Body"]);
+moveBy(bodyGroup, partPivotPoints["Body"], -1);
+
+const leftArmGroup = new THREE.Group();
+leftArmGroup.add(leftArmMesh);
+moveBy(leftArmMesh, partPivotPoints["Left Arm"], 1);
+addAllToGroup(leftArmOuterMesh, leftArmGroup, partPivotPoints["Left Arm"]);
+moveBy(leftArmGroup, partPivotPoints["Left Arm"], -1);
+
+const rightArmGroup = new THREE.Group();
+rightArmGroup.add(rightArmMesh);
+moveBy(rightArmMesh, partPivotPoints["Right Arm"], 1);
+addAllToGroup(rightArmOuterMesh, rightArmGroup, partPivotPoints["Right Arm"]);
+moveBy(rightArmGroup, partPivotPoints["Right Arm"], -1);
+
+const leftLegGroup = new THREE.Group();
+leftLegGroup.add(leftLegMesh);
+moveBy(leftLegMesh, partPivotPoints["Left Leg"], 1);
+addAllToGroup(leftLegOuterMesh, leftLegGroup, partPivotPoints["Left Leg"]);
+moveBy(leftLegGroup, partPivotPoints["Left Leg"], -1);
+
+const rightLegGroup = new THREE.Group();
+rightLegGroup.add(rightLegMesh);
+moveBy(rightLegMesh, partPivotPoints["Right Leg"], 1);
+addAllToGroup(rightLegOuterMesh, rightLegGroup, partPivotPoints["Right Leg"]);
+moveBy(rightLegGroup, partPivotPoints["Right Leg"], -1);
+
+preview.add(headGroup, bodyGroup, leftArmGroup, rightArmGroup, leftLegGroup, rightLegGroup)
 
 previewCamera.position.z = 30;
 
