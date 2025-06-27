@@ -535,9 +535,7 @@ function getPartAsCubeTextureArray(layer, part) {
     textures.forEach((value, index, array) => {
         value.colorSpace = THREE.SRGBColorSpace;
     })
-    if (layer != "Outer") {
-        textures[3].flipY = false;
-    }
+    textures[3].flipY = false;
     return textures;
 
 }
